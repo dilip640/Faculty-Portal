@@ -10,5 +10,5 @@ var Router = mux.NewRouter()
 
 // SetupRoutes setup the all routes
 func SetupRoutes() {
-	Router.HandleFunc("/", auth.HandleGreeting)
+	Router.HandleFunc("/", auth.HandleLogin)
 }
