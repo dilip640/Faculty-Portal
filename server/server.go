@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/dilip640/Faculty-Portal/endpoints"
+	"github.com/dilip640/Faculty-Portal/storage"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -24,7 +25,9 @@ func NewInstance() *Instance {
 
 // Start starts the server
 func (s *Instance) Start() { // Startup all dependencies
+	storage.Initialize()
 	endpoints.SetupRoutes()
+
 	s.httpServer = &http.Server{Addr: os.Getenv("HOST_ADDRESS"), Handler: endpoints.Router}
 	err := s.httpServer.ListenAndServe() // Blocks!
 	if err != nil {
