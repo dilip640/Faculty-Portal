@@ -1,23 +1,47 @@
 package auth
 
 import (
-	"html/template"
 	"net/http"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/dilip640/Faculty-Portal/templatemanager"
 )
 
 // HandleLogin handle the greeeting
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/login.tpl", "templates/base.tpl")
-	if err != nil {
-		log.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if GetUserName(r) != "" {
+		http.Redirect(w, r, "/profile", 302)
 	}
 
-	err = t.ExecuteTemplate(w, "base", struct{}{})
-	if err != nil {
-		log.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	name := r.FormValue("name")
+	pass := r.FormValue("password")
+	if name != "" && pass != "" {
+		// .. check credentials ..
+		setSession(name, w)
+		http.Redirect(w, r, "/profile", 302)
 	}
+
+	templatemanager.Render(w, GetUserName(r), struct{}{}, "base", "templates/login.tpl", "templates/base.tpl")
+}
+
+// HandleRegister handle the greeeting
+func HandleRegister(w http.ResponseWriter, r *http.Request) {
+	if GetUserName(r) != "" {
+		http.Redirect(w, r, "/profile", 302)
+	}
+
+	name := r.FormValue("name")
+	pass := r.FormValue("password")
+	if name != "" && pass != "" {
+		// .. check credentials ..
+		setSession(name, w)
+		http.Redirect(w, r, "/profile", 302)
+	}
+
+	templatemanager.Render(w, GetUserName(r), struct{}{}, "base", "templates/register.tpl", "templates/base.tpl")
+}
+
+// HandleLogout logout the user
+func HandleLogout(response http.ResponseWriter, request *http.Request) {
+	clearSession(response)
+	http.Redirect(response, request, "/", 302)
 }
