@@ -13,14 +13,16 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 	if err != nil {
 		log.Error(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
 	err = t.ExecuteTemplate(w, name, struct {
 		User string
-		data interface{}
+		Data interface{}
 	}{auth, input})
 	if err != nil {
 		log.Error(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 }

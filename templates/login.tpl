@@ -3,6 +3,11 @@
     <div class="container" style="margin-top:50px">
         <div class="row">
             <div class="col-md-6 mx-auto">
+                {{if .Data.Error}}
+                    <ul>
+                        <li style="color:red">{{.Data.Error}}</li>
+                    </ul>
+                {{end}}
                 <form method="POST" action="/login">
                     <div class="form-group">
                         <label for="exampleInputEmail1">Username</label>
