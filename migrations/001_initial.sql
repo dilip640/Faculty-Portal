@@ -1,11 +1,11 @@
 -- +migrate Up
 CREATE TABLE employee
 (
-    emp_id varchar(10) NOT NULL PRIMARY KEY,
-    first_fame varchar(20),
+    emp_id varchar(20) NOT NULL PRIMARY KEY,
+    first_name varchar(20),
     last_name varchar(20),
-    passwd varchar(50),
-    email varchar(50)
+    email varchar(50),
+    passwd text
 );
 
 -- +migrate Down
