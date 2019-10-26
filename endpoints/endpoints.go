@@ -26,4 +26,7 @@ func SetupRoutes() {
 	Router.HandleFunc("/logout", wrapHandlerWithLogging(auth.HandleLogout))
 	Router.HandleFunc("/register", wrapHandlerWithLogging(auth.HandleRegister))
 	Router.HandleFunc("/profile", wrapHandlerWithLogging(dashboard.HandleProfile))
+	Router.HandleFunc("/profile/{id}", wrapHandlerWithLogging(dashboard.HandleProfile))
+	Router.HandleFunc("/faculty/update",
+		wrapHandlerWithLogging(dashboard.HandleUpdateRegisterFaculty))
 }
