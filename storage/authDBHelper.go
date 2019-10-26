@@ -1,6 +1,8 @@
 package storage
 
-import "strings"
+import (
+	"strings"
+)
 
 // InsertEmployee add new employee
 func InsertEmployee(uname, fname, lname, email, passwd string) error {
@@ -19,4 +21,21 @@ func CheckPasswd(uname string) (string, error) {
 	err := row.Scan(&passwd)
 
 	return passwd, err
+}
+
+// GetEmployeeDetails returns all the details
+func GetEmployeeDetails(uname string) (Employee, error) {
+	employee := Employee{}
+	sqlStatement := `SELECT id, first_name, last_name, email FROM employee WHERE id = $1`
+	err := db.QueryRow(sqlStatement, uname).Scan(
+		&employee.Uname, &employee.Fname, &employee.Lname, &employee.Email)
+	return employee, err
+}
+
+// Employee for an Employee details
+type Employee struct {
+	Uname string
+	Fname string
+	Lname string
+	Email string
 }

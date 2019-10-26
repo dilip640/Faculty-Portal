@@ -26,6 +26,7 @@ func NewInstance() *Instance {
 // Start starts the server
 func (s *Instance) Start() { // Startup all dependencies
 	storage.Initialize()
+	storage.InitializeMongo()
 	endpoints.SetupRoutes()
 
 	s.httpServer = &http.Server{Addr: os.Getenv("HOST_ADDRESS"), Handler: endpoints.Router}
