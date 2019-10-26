@@ -5,6 +5,7 @@ CREATE TABLE faculty
     start_date DATE,
     end_date DATE,
     dept varchar(10),
+    cv_id text,
     PRIMARY KEY(emp_id, start_date)
 );
 
