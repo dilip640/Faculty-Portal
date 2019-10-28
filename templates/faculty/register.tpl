@@ -8,7 +8,7 @@
                         <li style="color:red">{{.Data.Error}}</li>
                     </ul>
                 {{end}}
-                <form method="POST" action="/faculty/register">
+                <form method="POST" action="/faculty/update">
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label for="exampleInputstartdate" id="exampleInputstartdate">Start Date</label>

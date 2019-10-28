@@ -32,15 +32,23 @@
                             <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                         </li>
                     </ul>
-                    <form class="form-inline my-2 my-lg-0">
+                    <ul class="navbar-nav ml-auto">
                         {{ if .User}}
-                            <a href="/profile" class="btn btn-outline-success my-2 my-sm-0" >Profile</a>
-                            <a href="/logout" class="btn btn-outline-success my-2 my-sm-0" >Logout</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{.User}}</a>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="/profile">Profile</a>
+                                    <a class="dropdown-item" href="/faculty/update">Register As Faculty</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="/logout">Logout</a>
+                                </div>
+                            </li>
                         {{else}}
                             <a href="/login" class="btn btn-outline-success my-2 my-sm-0" >Login</a>
                             <a href="/register" class="btn btn-outline-success my-2 my-sm-0" >Register</a>
                         {{end}}
-                    </form>
+                    </ul>
                 </div>
             </nav>
 
@@ -48,9 +56,10 @@
 
             <!-- Optional JavaScript -->
             <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+            <script
+			  src="https://code.jquery.com/jquery-3.4.1.min.js"
+			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			  crossorigin="anonymous"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
