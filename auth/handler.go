@@ -36,7 +36,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	templatemanager.Render(w, GetUserName(r), data, "base", "templates/login.tpl", "templates/base.tpl")
+	templatemanager.Render(w, GetUserName(r), data, "base", "templates/login.html", "templates/base.html")
 }
 
 // HandleRegister handle the greeeting
@@ -64,7 +64,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 			data.Error = "Username Taken!"
 		}
 	}
-	templatemanager.Render(w, GetUserName(r), data, "base", "templates/register.tpl", "templates/base.tpl")
+	templatemanager.Render(w, GetUserName(r), data, "base", "templates/register.html", "templates/base.html")
 }
 
 // HandleLogout logout the user

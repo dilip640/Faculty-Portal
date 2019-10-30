@@ -13,7 +13,7 @@ import (
 // HandleHome handle the greeeting
 func HandleHome(w http.ResponseWriter, r *http.Request) {
 	templatemanager.Render(w, auth.GetUserName(r), struct{}{}, "base",
-		"templates/index.tpl", "templates/base.tpl")
+		"templates/index.html", "templates/base.html")
 }
 
 // HandleProfile handle the greeeting
@@ -60,7 +60,7 @@ func HandleProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templatemanager.Render(w, userName, data, "base",
-		"templates/profile.tpl", "templates/faculty/cv_template.tpl", "templates/base.tpl")
+		"templates/profile.html", "templates/faculty/cv_template.html", "templates/base.html")
 }
 
 // HandleUpdateRegisterFaculty for update and register faculty
@@ -92,7 +92,7 @@ func HandleUpdateRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templatemanager.Render(w, userName, data, "base",
-		"templates/faculty/register.tpl", "templates/base.tpl")
+		"templates/faculty/register.html", "templates/base.html")
 }
 
 // HandleCVEdit for edit cv
@@ -134,7 +134,7 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	templatemanager.Render(w, userName, data, "base",
-		"templates/faculty/editCV.tpl", "templates/faculty/cv_template.tpl", "templates/base.tpl")
+		"templates/faculty/editCV.html", "templates/faculty/cv_template.html", "templates/base.html")
 }
 
 type cssparam struct {
