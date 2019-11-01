@@ -2,35 +2,54 @@ package storage
 
 import (
 	"context"
-	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// SaveCVDetails returns cv details
-func SaveCVDetails(cvdetail CVDetail) error {
+// GetCVID returns id
+func GetCVID(uname string) primitive.ObjectID {
 	collection := client.Database("faculry_portal").Collection("cv")
-	cvID, err := GetFacultyCV(cvdetail.Uname)
-
+	cvID, err := GetFacultyCV(uname)
 	if err != nil {
 		var result *mongo.InsertOneResult
-		result, err = collection.InsertOne(context.TODO(), cvdetail)
+		result, err = collection.InsertOne(context.TODO(), CVDetail{})
 		if err == nil {
 			if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
-				SetFacultyCV(cvdetail.Uname, oid.Hex())
-			} else {
-				return errors.New("Error in getting Inserted Id")
+				SetFacultyCV(uname, oid.Hex())
+				cvID = oid.Hex()
 			}
 		}
-	} else {
-		objID, err := primitive.ObjectIDFromHex(cvID)
-		if err != nil {
-			return err
-		}
-		_, err = collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}}, bson.M{"$set": cvdetail})
 	}
+	objID, _ := primitive.ObjectIDFromHex(cvID)
+	return objID
+}
+
+// SaveBio saves bio
+func SaveBio(uname, bio string) error {
+	collection := client.Database("faculry_portal").Collection("cv")
+	objID := GetCVID(uname)
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+		bson.M{"$set": bson.M{"overview.biography": bio}})
+	return err
+}
+
+// SaveAboutme saves aboutme
+func SaveAboutme(uname, aboutme string) error {
+	collection := client.Database("faculry_portal").Collection("cv")
+	objID := GetCVID(uname)
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+		bson.M{"$set": bson.M{"overview.aboutme": aboutme}})
+	return err
+}
+
+// AddProject add new project
+func AddProject(uname string, project CVProject) error {
+	collection := client.Database("faculry_portal").Collection("cv")
+	objID := GetCVID(uname)
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+		bson.M{"$push": bson.M{"projects": project}})
 	return err
 }
 
@@ -54,12 +73,19 @@ func GetCVDetails(uname string) (CVDetail, error) {
 
 // CVDetail struct for cv
 type CVDetail struct {
-	Uname    string     `bson:"uname"`
-	Overview CVOverview `bson:"overview"`
+	Uname    string      `bson:"uname,omitempty"`
+	Overview CVOverview  `bson:"overview,omitempty"`
+	Project  []CVProject `bson:"projects,omitempty"`
 }
 
 // CVOverview struct
 type CVOverview struct {
-	Biography string `bson:"biography"`
-	AboutMe   string `bson:"aboutme"`
+	Biography string `bson:"biography,omitempty"`
+	AboutMe   string `bson:"aboutme,omitempty"`
+}
+
+// CVProject struct
+type CVProject struct {
+	Title  string `bson:"title,omitempty"`
+	Detail string `bson:"detail,omitempty"`
 }

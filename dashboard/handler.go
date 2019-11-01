@@ -1,6 +1,9 @@
 package dashboard
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/dilip640/Faculty-Portal/auth"
@@ -102,20 +105,28 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", 302)
 	}
 
-	bio := r.FormValue("bio")
-	about := r.FormValue("about")
 	if r.Method == http.MethodPost {
-		cvdetail := storage.CVDetail{
-			Uname: userName,
-			Overview: storage.CVOverview{
-				Biography: bio,
-				AboutMe:   about,
-			},
+		var err error
+		var reqStruct cvEditRequest
+		bodyBytes, _ := ioutil.ReadAll(r.Body)
+		err = json.Unmarshal(bodyBytes, &reqStruct)
+
+		log.Print(err, reqStruct)
+
+		if bio := reqStruct.Biography; bio != nil {
+			err = storage.SaveBio(userName, *bio)
+		} else if aboutme := reqStruct.AboutMe; aboutme != nil {
+			err = storage.SaveAboutme(userName, *aboutme)
+		} else if project := reqStruct.Project; project != nil {
+			err = storage.AddProject(userName, *project)
 		}
-		err := storage.SaveCVDetails(cvdetail)
 		if err != nil {
 			log.Error(err)
+			fmt.Fprint(w, struct{ status string }{"error"})
+			return
 		}
+		fmt.Fprint(w, struct{ status string }{"ok"})
+		return
 	}
 
 	data := struct {
@@ -140,4 +151,10 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 type cssparam struct {
 	Edit  bool
 	Class string
+}
+
+type cvEditRequest struct {
+	Biography *string            `json:"biography"`
+	AboutMe   *string            `json:"aboutme"`
+	Project   *storage.CVProject `json:"project"`
 }

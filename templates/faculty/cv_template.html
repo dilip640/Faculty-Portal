@@ -10,7 +10,7 @@
                         <i class="fas fa-user"></i> Overview</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#menu1">
+                    <a class="nav-link" data-toggle="tab" href="#project">
                         <i class="fas fa-cube"></i> Project</a>
                 </li>
                 <li class="nav-item">
@@ -26,27 +26,60 @@
                     <a class="nav-link" href="/faculty/editcv">
                         <i class="fas fa-edit"></i>Edit</a>
                 </li>
+                {{else}}
+                <li class="ml-auto">
+                    <a class="nav-link" href="/profile">
+                        <i class="fas fa-eye"></i> Profile</a>
+                </li>
                 {{end}}
             </ul>
 
             <!-- Tab panes -->
             <div class="tab-content">
+                <div id="alertbox" style="display: none;" class="alert alert-info" role="alert"></div>
                 <div id="overview" class="container tab-pane active"><br>
-                    <div>
-                        <h3>Biography</h3>
-                        <p data-placeholder="Describe yourself..." id="bio" contenteditable="{{ .Data.Style.Edit }}"
-                            class="{{ .Data.Style.Class }}">
-                            {{ .Data.CVDetail.Overview.Biography}}</p>
+                    <div class="cvdiv row">
+                        <div class="col-md-6">
+                            <h3>Biography</h3>
+                        </div>
+                        <div class="col-md-12">
+                            <p data-placeholder="Describe yourself..." id="bio" contenteditable="{{ .Data.Style.Edit }}"
+                                class="{{ .Data.Style.Class }}">{{ .Data.CVDetail.Overview.Biography}}</p>
+                        </div>
+                        {{if .Data.Style.Edit}}
+                        <div class="col-md-6 ml-auto"><a href="#" onClick="saveBio();"><i class="fas fa-save">
+                                    Save</i></a></div>
+                        {{end}}
                     </div>
-                    <h4>About Me</h4>
-                    <p data-placeholder="Write about you..." id="about" contenteditable="{{ .Data.Style.Edit }}"
-                        class="{{ .Data.Style.Class }}">
-                        {{ .Data.CVDetail.Overview.AboutMe}}</p>
+                    <div class="cvdiv">
+                        <h4>About Me</h4>
+                        <p data-placeholder="Write about you..." id="about" contenteditable="{{ .Data.Style.Edit }}"
+                            class="{{ .Data.Style.Class }}">{{ .Data.CVDetail.Overview.AboutMe}}</p>
+                        {{if .Data.Style.Edit}}
+                        <div class="col-md-6 ml-auto"><a href="#" onClick="saveAbout();"><i class="fas fa-save">
+                                    Save</i></a></div>
+                        {{end}}
+                    </div>
                 </div>
-                <div id="menu1" class="container tab-pane fade"><br>
-                    <h3>Menu 1</h3>
-                    <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                        consequat.</p>
+                <div id="project" class="container tab-pane fade"><br>
+                    {{range $val := .Data.CVDetail.Project}}
+                    <h3>{{$val.Title}}</h3>
+                    <p>{{$val.Detail}}</p>
+                    {{end}}
+                    {{if .Data.Style.Edit}}
+                    <form id="prform" onsubmit="return addProject()">
+                        <div class="form-group col-md-6">
+                            <label for="projecttitle" id="projecttitle">Project Title</label>
+                            <input type="text" name="projecttitle" class="form-control" id="projecttitle" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="projectdesc" id="projectdesc">Project Description</label>
+                            <input type="text" name="projectdesc" class="form-control" id="projectdesc" required>
+                        </div>
+                        <div class="col-md-6"><button class="btn btn-primary" type="submit"><i class="fas fa-plus">
+                                    Add New</i></button></div>
+                        {{end}}
+                    </form>
                 </div>
                 <div id="menu2" class="container tab-pane fade"><br>
                     <h3>Menu 2</h3>

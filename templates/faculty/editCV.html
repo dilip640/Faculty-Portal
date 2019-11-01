@@ -6,28 +6,42 @@
     }
 </style>
 {{template "cv_template" .}}
-<div class="container">
-    <div class="row">
-        <div class="col-md-2 mx-auto">
-            <button type="button" id="submitButton" class="btn btn-primary">Save</button>
-        </div>
-    </div>
-</div>
 {{end}}
 {{define "js"}}
 <script>
-    $(document).ready(function () {
-        $('#submitButton').click(function () {
-            $.ajax({
-                type: 'POST',
-                url: '/faculty/editcv',
-                data: {
-                    'bio': $('#bio').text(),
-                    'about': $('#about').text()
-                },
-                success: function (msg) { }
-            });
+    function saveBio() {
+        senddata({ 'biography': $('#bio').text() });
+    }
+    function saveAbout() {
+        senddata({ 'aboutme': $('#about').text() });
+    }
+
+    function addProject() {
+        var formdata = $('#prform').serializeArray();
+        senddata({
+            'project': {
+                'title': formdata[0].value,
+                'detail': formdata[1].value,
+            }
         });
-    });
+        return false;
+    }
+
+    function senddata(data) {
+        $(this).prop('disabled', true);
+        $('#alertbox').show().html('saving..');
+        var jsondata = JSON.stringify(data);
+        $.ajax({
+            type: 'POST',
+            url: '/faculty/editcv',
+            data: jsondata,
+            success: function (msg) {
+                $('#alertbox').show().html('changes saved');
+            },
+            error: function (e) {
+                $('#alertbox').show().html('error saving');
+            }
+        });
+    }
 </script>
 {{end}}

@@ -54,3 +54,17 @@
     {{end}}
 </div>
 {{end}}
+
+{{define "js"}}
+<script>
+    $(document).ready(function () {
+        $('.cvdiv').each(function () {
+            if (isEmpty($(this).find('p')))
+                $(this).hide();
+        });
+    });
+    function isEmpty(el) {
+        return !$.trim(el.html())
+    }
+</script>
+{{end}}
