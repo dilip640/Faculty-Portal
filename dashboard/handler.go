@@ -119,6 +119,12 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 			err = storage.SaveAboutme(userName, *aboutme)
 		} else if project := reqStruct.Project; project != nil {
 			err = storage.AddProject(userName, *project)
+		} else if dproject := reqStruct.Deleteproject; dproject != nil {
+			err = storage.DeleteProject(userName, *dproject)
+		} else if prize := reqStruct.Prize; prize != nil {
+			err = storage.AddPrize(userName, *prize)
+		} else if dprize := reqStruct.Deleteprize; dprize != nil {
+			err = storage.DeletePrize(userName, *dprize)
 		}
 		if err != nil {
 			log.Error(err)
@@ -154,7 +160,10 @@ type cssparam struct {
 }
 
 type cvEditRequest struct {
-	Biography *string            `json:"biography"`
-	AboutMe   *string            `json:"aboutme"`
-	Project   *storage.CVProject `json:"project"`
+	Biography     *string            `json:"biography"`
+	AboutMe       *string            `json:"aboutme"`
+	Project       *storage.CVProject `json:"project"`
+	Deleteproject *string            `json:"deleteproject"`
+	Prize         *storage.CVPrize   `json:"prize"`
+	Deleteprize   *string            `json:"deleteprize"`
 }

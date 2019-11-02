@@ -53,6 +53,33 @@ func AddProject(uname string, project CVProject) error {
 	return err
 }
 
+// DeleteProject delete a project
+func DeleteProject(uname, project string) error {
+	collection := client.Database("faculry_portal").Collection("cv")
+	objID := GetCVID(uname)
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+		bson.M{"$pull": bson.M{"projects": CVProject{Title: project}}})
+	return err
+}
+
+// AddPrize add new prize
+func AddPrize(uname string, prize CVPrize) error {
+	collection := client.Database("faculry_portal").Collection("cv")
+	objID := GetCVID(uname)
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+		bson.M{"$push": bson.M{"prizes": prize}})
+	return err
+}
+
+// DeletePrize delete a prize
+func DeletePrize(uname, prize string) error {
+	collection := client.Database("faculry_portal").Collection("cv")
+	objID := GetCVID(uname)
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+		bson.M{"$pull": bson.M{"prizes": CVPrize{Title: prize}}})
+	return err
+}
+
 // GetCVDetails returns cv details
 func GetCVDetails(uname string) (CVDetail, error) {
 	cvdetail := CVDetail{}
@@ -76,6 +103,7 @@ type CVDetail struct {
 	Uname    string      `bson:"uname,omitempty"`
 	Overview CVOverview  `bson:"overview,omitempty"`
 	Project  []CVProject `bson:"projects,omitempty"`
+	Prizes   []CVPrize   `bson:"prizes,omitempty"`
 }
 
 // CVOverview struct
@@ -88,4 +116,10 @@ type CVOverview struct {
 type CVProject struct {
 	Title  string `bson:"title,omitempty"`
 	Detail string `bson:"detail,omitempty"`
+}
+
+// CVPrize struct
+type CVPrize struct {
+	Title string `bson:"title,omitempty"`
+	Prize string `bson:"prize,omitempty"`
 }

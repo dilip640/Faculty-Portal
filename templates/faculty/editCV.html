@@ -23,11 +23,30 @@
                 'title': formdata[0].value,
                 'detail': formdata[1].value,
             }
-        });
+        }, true);
         return false;
     }
 
-    function senddata(data) {
+    function deleteProject(projecttitle){
+        senddata({ 'deleteproject': projecttitle }, true);
+    }
+
+    function addPrize() {
+        var formdata = $('#prizeform').serializeArray();
+        senddata({
+            'prize': {
+                'title': formdata[0].value,
+                'prize': formdata[1].value,
+            }
+        }, true);
+        return false;
+    }
+
+    function deletePrize(prizetitle){
+        senddata({ 'deleteprize': prizetitle }, true);
+    }
+
+    function senddata(data, reload=false) {
         $(this).prop('disabled', true);
         $('#alertbox').show().html('saving..');
         var jsondata = JSON.stringify(data);
@@ -37,6 +56,8 @@
             data: jsondata,
             success: function (msg) {
                 $('#alertbox').show().html('changes saved');
+                if(reload)
+                    location.reload()
             },
             error: function (e) {
                 $('#alertbox').show().html('error saving');
