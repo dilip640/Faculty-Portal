@@ -15,7 +15,9 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Error string
+		Faculty  storage.Faculty
+		Employee storage.Employee
+		Error    string
 	}{}
 
 	name := r.FormValue("name")
@@ -44,8 +46,11 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	if GetUserName(r) != "" {
 		http.Redirect(w, r, "/profile", 302)
 	}
+
 	data := struct {
-		Error string
+		Faculty  storage.Faculty
+		Employee storage.Employee
+		Error    string
 	}{}
 
 	name := r.FormValue("name")

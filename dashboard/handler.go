@@ -15,7 +15,11 @@ import (
 
 // HandleHome handle the greeeting
 func HandleHome(w http.ResponseWriter, r *http.Request) {
-	templatemanager.Render(w, auth.GetUserName(r), struct{}{}, "base",
+	data := struct {
+		Faculty  storage.Faculty
+		Employee storage.Employee
+	}{}
+	templatemanager.Render(w, auth.GetUserName(r), data, "base",
 		"templates/index.html", "templates/base.html")
 }
 
@@ -74,7 +78,9 @@ func HandleUpdateRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Error string
+		Faculty  storage.Faculty
+		Employee storage.Employee
+		Error    string
 	}{}
 
 	startDate := r.FormValue("start_date")
@@ -136,6 +142,8 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
+		Faculty  storage.Faculty
+		Employee storage.Employee
 		CVDetail storage.CVDetail
 		Style    cssparam
 		Self     bool

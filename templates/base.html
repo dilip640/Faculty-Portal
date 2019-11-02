@@ -41,7 +41,11 @@
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{.User}}</a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
+                        {{if .Data.Faculty}}
+                        <a class="dropdown-item" href="/faculty/update">Update Faculty</a>
+                        {{else}}
                         <a class="dropdown-item" href="/faculty/update">Register As Faculty</a>
+                        {{end}}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Logout</a>
                     </div>
