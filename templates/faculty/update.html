@@ -1,4 +1,4 @@
-{{define "title"}}Faculty | Register{{end}}
+{{define "title"}}Faculty | Update{{end}}
 {{define "content"}}
 <div class="container" style="margin-top:50px">
     <div class="row">
@@ -8,10 +8,17 @@
                 <li style="color:red">{{.Data.Error}}</li>
             </ul>
             {{end}}
-            <form method="POST" action="/faculty/register">
-                <div class="form-group">
-                    <label for="exampleInputstartdate" id="exampleInputstartdate">Start Date</label>
-                    <input type="date" name="start_date" id="exampleInputstartdate" class="form-control" required>
+            <form method="POST" action="/faculty/update">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputstartdate" id="exampleInputstartdate">Start Date</label>
+                        <input type="date" value="{{.Faculty.StartDate}}" name="start_date"
+                            id="exampleInputstartdate" class="form-control" disabled>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="exampleInputenddate" id="exampleInputenddate">End Date</label>
+                        <input type="date" name="end_date" id="exampleInputenddate" class="form-control" required>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="exampleInputdepartment" id="exampleInputdepartment">Department</label>

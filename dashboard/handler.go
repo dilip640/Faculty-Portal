@@ -15,11 +15,7 @@ import (
 
 // HandleHome handle the greeeting
 func HandleHome(w http.ResponseWriter, r *http.Request) {
-	data := struct {
-		Faculty  storage.Faculty
-		Employee storage.Employee
-	}{}
-	templatemanager.Render(w, auth.GetUserName(r), data, "base",
+	templatemanager.Render(w, auth.GetUserName(r), struct{}{}, "base",
 		"templates/index.html", "templates/base.html")
 }
 
@@ -37,27 +33,10 @@ func HandleProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Faculty  storage.Faculty
-		Employee storage.Employee
 		CVDetail storage.CVDetail
 		Style    cssparam
 		Self     bool
 	}{Self: self}
-
-	faculty, err := storage.GetFacultyDetails(userName)
-	if err == nil {
-		faculty.FacultyConvert()
-		data.Faculty = faculty
-	} else {
-		log.Error(err)
-	}
-
-	employee, err := storage.GetEmployeeDetails(userName)
-	if err == nil {
-		data.Employee = employee
-	} else {
-		log.Error(err)
-	}
 
 	cvdetail, err := storage.GetCVDetails(userName)
 	if err == nil {
@@ -70,8 +49,8 @@ func HandleProfile(w http.ResponseWriter, r *http.Request) {
 		"templates/profile.html", "templates/faculty/cv_template.html", "templates/base.html")
 }
 
-// HandleUpdateRegisterFaculty for update and register faculty
-func HandleUpdateRegisterFaculty(w http.ResponseWriter, r *http.Request) {
+// HandleRegisterFaculty for update and register faculty
+func HandleRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 	userName := auth.GetUserName(r)
 	if userName == "" {
 		http.Redirect(w, r, "/login", 302)
@@ -84,12 +63,11 @@ func HandleUpdateRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 	}{}
 
 	startDate := r.FormValue("start_date")
-	endDate := r.FormValue("end_date")
 	dept := r.FormValue("dept")
 
-	if startDate != "" && endDate != "" && dept != "" {
+	if startDate != "" && dept != "" {
 		data.Error = "Enter Correct Details!"
-		err := storage.InsertUpdateFaculty(userName, startDate, endDate, dept)
+		err := storage.InsertFaculty(userName, startDate, dept)
 		if err == nil {
 			http.Redirect(w, r, "/profile", 302)
 		} else {
@@ -102,6 +80,42 @@ func HandleUpdateRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 
 	templatemanager.Render(w, userName, data, "base",
 		"templates/faculty/register.html", "templates/base.html")
+}
+
+// HandleUpdateFaculty for update and register faculty
+func HandleUpdateFaculty(w http.ResponseWriter, r *http.Request) {
+	userName := auth.GetUserName(r)
+	if userName == "" {
+		http.Redirect(w, r, "/login", 302)
+	}
+
+	data := struct {
+		Error string
+	}{}
+
+	faculty, err := storage.GetFacultyDetails(userName)
+	if err != nil {
+		log.Error(err)
+	}
+
+	endDate := r.FormValue("end_date")
+	dept := r.FormValue("dept")
+
+	if endDate != "" && dept != "" {
+		data.Error = "Enter Correct Details!"
+		err := storage.UpdateFaculty(userName, faculty.StartDate, endDate, dept)
+		if err == nil {
+			http.Redirect(w, r, "/profile", 302)
+		} else {
+			if err.Error() == "pq: Faculty Exists!" {
+				data.Error = "Faculty Exists!"
+			}
+			log.Error(err)
+		}
+	}
+
+	templatemanager.Render(w, userName, data, "base",
+		"templates/faculty/update.html", "templates/base.html")
 }
 
 // HandleCVEdit for edit cv

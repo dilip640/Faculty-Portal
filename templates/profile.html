@@ -1,7 +1,7 @@
 {{define "title"}}Profile{{end}}
 {{define "content"}}
 <div class="container" style="margin-top:50px">
-    {{if .Data.Employee.Uname}}
+    {{if .Employee.Uname}}
     <div class="row">
         <div class="col-md-12 mx-auto">
             <div class="card">
@@ -12,18 +12,18 @@
                             <b>Username : </b>{{.User}}
                         </div>
                         <div class="col-md-4">
-                            <b>Name : </b>{{.Data.Employee.Fname}}
-                            {{.Data.Employee.Lname}}
+                            <b>Name : </b>{{.Employee.Fname}}
+                            {{.Employee.Lname}}
                         </div>
                         <div class="col-md-4">
-                            <b>Email : </b>{{.Data.Employee.Email}}
+                            <b>Email : </b>{{.Employee.Email}}
                         </div>
                     </div>
                 </div>
             </div><br><br>
         </div>
     </div>
-    {{if .Data.Faculty.Uname}}
+    {{if .Faculty.Uname}}
     <div class="row">
         <div class="col-md-12 mx-auto">
             <div class="card">
@@ -31,13 +31,13 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <b>Dept : </b>{{.Data.Faculty.Dept}}
+                            <b>Dept : </b>{{.Faculty.Dept}}
                         </div>
                         <div class="col-md-4">
-                            <b>Start Date : </b>{{.Data.Faculty.StartDate}}
+                            <b>Start Date : </b>{{.Faculty.StartDate}}
                         </div>
                         <div class="col-md-4">
-                            <b>End Date : </b>{{.Data.Faculty.EndDate}}
+                            <b>End Date : </b>{{.Faculty.EndDate}}
                         </div>
                     </div>
                 </div>
