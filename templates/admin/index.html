@@ -11,18 +11,45 @@
                     <div class="card">
                         <div class="card-body">
                             <h4 class="card-title">{{$val.Name}}</h4>
-                            <a href="#" onClick="deleteDept('{{$val.DeptID}}');"> <i class="fas fa-times-circle"></i></a>
+                            <a href="#" onClick="deleteDept('{{$val.DeptID}}');"> <i
+                                    class="fas fa-times-circle"></i></a>
                         </div>
                     </div>
                     {{end}}
                     <hr>
-                    <form id="prform" onsubmit="return addDept()">
+                    <form id="deptform" onsubmit="return addDept()">
                         <div class="form-group col-md-6">
-                            <label for="deptname" id="deptname">Project Title</label>
+                            <label for="deptname" id="deptname">Department Name</label>
                             <input type="text" name="deptname" class="form-control" id="deptname" required>
                         </div>
                         <div class="col-md-6"><button class="btn btn-primary" type="submit"><i class="fas fa-plus">
                                     Add Department</i></button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 mx-auto">
+            <div class="card">
+                <div class="card-header">Post Details</div>
+                <div class="card-body">
+                    <div id="alertbox" style="display: none;" class="alert alert-info" role="alert"></div>
+                    {{range $val := .Data.Posts}}
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">{{$val.Name}}</h4>
+                            <a href="#" onClick="deletePost('{{$val.PostID}}');"> <i
+                                    class="fas fa-times-circle"></i></a>
+                        </div>
+                    </div>
+                    {{end}}
+                    <hr>
+                    <form id="postform" onsubmit="return addPost()">
+                        <div class="form-group col-md-6">
+                            <label for="postname" id="postname">Post Name</label>
+                            <input type="text" name="postname" class="form-control" id="postname" required>
+                        </div>
+                        <div class="col-md-6"><button class="btn btn-primary" type="submit"><i class="fas fa-plus">
+                                    Add Post</i></button></div>
                     </form>
                 </div>
             </div>
@@ -38,9 +65,21 @@
     }
 
     function addDept() {
-        var formdata = $('#prform').serializeArray();
+        var formdata = $('#deptform').serializeArray();
         senddata({
             'addDept': formdata[0].value,
+        }, true);
+        return false;
+    }
+
+    function deletePost(postID) {
+        senddata({ 'deletePost': postID }, true);
+    }
+
+    function addPost() {
+        var formdata = $('#postform').serializeArray();
+        senddata({
+            'addPost': formdata[0].value,
         }, true);
         return false;
     }

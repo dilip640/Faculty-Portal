@@ -21,7 +21,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == http.MethodPost {
 		var err error
-		var reqStruct deptEditRequest
+		var reqStruct adminEditRequest
 		bodyBytes, _ := ioutil.ReadAll(r.Body)
 		err = json.Unmarshal(bodyBytes, &reqStruct)
 
@@ -29,6 +29,10 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 			err = storage.InsertDepartment(*deptName)
 		} else if deptID := reqStruct.DeleteDept; deptID != nil {
 			err = storage.DeleteDepartment(*deptID)
+		} else if postName := reqStruct.AddPost; postName != nil {
+			err = storage.InsertPost(*postName)
+		} else if postID := reqStruct.DeletePost; postID != nil {
+			err = storage.DeletePost(*postID)
 		}
 		if err != nil {
 			log.Error(err)
@@ -41,18 +45,30 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Departments []*storage.Department
+		Posts       []*storage.Post
 	}{}
+
 	depts, err := storage.GetAllDepartments()
 	if err == nil {
 		data.Departments = depts
 	} else {
 		log.Error(err)
 	}
+
+	posts, err := storage.GetAllPosts()
+	if err == nil {
+		data.Posts = posts
+	} else {
+		log.Error(err)
+	}
+
 	templatemanager.Render(w, auth.GetUserName(r), data, "base",
 		"templates/admin/index.html", "templates/base.html")
 }
 
-type deptEditRequest struct {
+type adminEditRequest struct {
 	DeleteDept *string `json:"deleteDept"`
 	AddDept    *string `json:"addDept"`
+	DeletePost *string `json:"deletePost"`
+	AddPost    *string `json:"addPost"`
 }

@@ -1,5 +1,7 @@
 package storage
 
+import log "github.com/sirupsen/logrus"
+
 // InsertDepartment add new dept
 func InsertDepartment(deptName string) error {
 	sqlStatement := `INSERT INTO department (dept_name) VALUES ($1);`
@@ -42,10 +44,11 @@ func GetAllDepartments() ([]*Department, error) {
 			deptName string
 		)
 
-		if err := rows.Scan(&deptID, &deptName); err != nil {
-			return depts, err
+		if err := rows.Scan(&deptID, &deptName); err == nil {
+			depts = append(depts, &Department{deptID, deptName})
+		} else {
+			log.Error(err)
 		}
-		depts = append(depts, &Department{deptID, deptName})
 	}
 
 	return depts, nil
