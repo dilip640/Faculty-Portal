@@ -39,6 +39,8 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 			i, _ := strconv.Atoi(*postID)
 
 			err = storage.DeletePost(i)
+		} else if hod := reqStruct.AssignHOD; hod != nil {
+			err = storage.InsertHOD(*hod)
 		}
 		if err != nil {
 			log.Error(err)
@@ -73,8 +75,9 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 }
 
 type adminEditRequest struct {
-	DeleteDept *string `json:"deleteDept"`
-	AddDept    *string `json:"addDept"`
-	DeletePost *string `json:"deletePost"`
-	AddPost    *string `json:"addPost"`
+	DeleteDept *string      `json:"deleteDept"`
+	AddDept    *string      `json:"addDept"`
+	DeletePost *string      `json:"deletePost"`
+	AddPost    *string      `json:"addPost"`
+	AssignHOD  *storage.HOD `json:"assignHOD"`
 }
