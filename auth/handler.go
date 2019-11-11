@@ -12,6 +12,7 @@ import (
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	if GetUserName(r) != "" {
 		http.Redirect(w, r, "/profile", 302)
+		return
 	}
 
 	data := struct {
@@ -44,6 +45,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	if GetUserName(r) != "" {
 		http.Redirect(w, r, "/profile", 302)
+		return
 	}
 
 	data := struct {

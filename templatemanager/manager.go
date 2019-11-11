@@ -18,15 +18,23 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 	}
 
 	data := struct {
-		User     string
-		Data     interface{}
-		Faculty  storage.Faculty
-		Employee storage.Employee
+		User      string
+		Data      interface{}
+		Faculty   storage.Faculty
+		CCFaculty storage.CCFaculty
+		Employee  storage.Employee
 	}{User: auth, Data: input}
 
 	faculty, err := storage.GetFacultyDetails(auth)
 	if err == nil {
 		data.Faculty = faculty
+	} else {
+		log.Error(err)
+	}
+
+	ccFaculty, err := storage.GetCCFacultyDetails(auth)
+	if err == nil {
+		data.CCFaculty = ccFaculty
 	} else {
 		log.Error(err)
 	}

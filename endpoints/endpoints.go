@@ -6,6 +6,7 @@ import (
 	"github.com/dilip640/Faculty-Portal/admin"
 	"github.com/dilip640/Faculty-Portal/auth"
 	"github.com/dilip640/Faculty-Portal/dashboard"
+	"github.com/dilip640/Faculty-Portal/personalcv"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -30,8 +31,10 @@ func SetupRoutes() {
 	Router.HandleFunc("/profile/{id}", wrapHandlerWithLogging(dashboard.HandleProfile))
 	Router.HandleFunc("/faculty/register",
 		wrapHandlerWithLogging(dashboard.HandleRegisterFaculty))
+	Router.HandleFunc("/ccfaculty/register",
+		wrapHandlerWithLogging(dashboard.HandleRegisterCCFaculty))
 	Router.HandleFunc("/faculty/editcv",
-		wrapHandlerWithLogging(dashboard.HandleCVEdit))
+		wrapHandlerWithLogging(personalcv.HandleCVEdit))
 
 	// Admin routes
 	Router.HandleFunc("/admin",

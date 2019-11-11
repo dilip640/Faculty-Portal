@@ -44,6 +44,9 @@
                         {{if not .Faculty.EmpID}}
                         <a class="dropdown-item" href="/faculty/register">Register As Faculty</a>
                         {{end}}
+                        {{if not .CCFaculty.EmpID}}
+                        <a class="dropdown-item" href="/ccfaculty/register">Register As CC Faculty</a>
+                        {{end}}
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/logout">Logout</a>
                     </div>
