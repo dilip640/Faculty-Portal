@@ -41,9 +41,7 @@
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{.User}}</a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/profile">Profile</a>
-                        {{if .Faculty.Uname}}
-                        <a class="dropdown-item" href="/faculty/update">Update Faculty Details</a>
-                        {{else}}
+                        {{if not .Faculty.EmpID}}
                         <a class="dropdown-item" href="/faculty/register">Register As Faculty</a>
                         {{end}}
                         <div class="dropdown-divider"></div>

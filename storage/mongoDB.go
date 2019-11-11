@@ -14,6 +14,7 @@ var client *mongo.Client
 // InitializeMongo start connection to mongo
 func InitializeMongo() {
 	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_CONN_URI"))
+
 	var err error
 	client, err = mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {

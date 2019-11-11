@@ -4,103 +4,78 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// GetCVID returns id
-func GetCVID(uname string) primitive.ObjectID {
-	collection := client.Database("faculry_portal").Collection("cv")
-	cvID, err := GetFacultyCV(uname)
-	if err != nil {
-		var result *mongo.InsertOneResult
-		result, err = collection.InsertOne(context.TODO(), CVDetail{})
-		if err == nil {
-			if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
-				SetFacultyCV(uname, oid.Hex())
-				cvID = oid.Hex()
-			}
-		}
-	}
-	objID, _ := primitive.ObjectIDFromHex(cvID)
-	return objID
+// CreateCV initializes an entry in mongoDB
+func CreateCV(empID string) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	cvDetail := CVDetail{EmpID: empID}
+	_, err := collection.InsertOne(context.TODO(), cvDetail)
+	return err
 }
 
 // SaveBio saves bio
-func SaveBio(uname, bio string) error {
-	collection := client.Database("faculry_portal").Collection("cv")
-	objID := GetCVID(uname)
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+func SaveBio(empID, bio string) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}},
 		bson.M{"$set": bson.M{"overview.biography": bio}})
 	return err
 }
 
 // SaveAboutme saves aboutme
-func SaveAboutme(uname, aboutme string) error {
-	collection := client.Database("faculry_portal").Collection("cv")
-	objID := GetCVID(uname)
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+func SaveAboutme(empID, aboutme string) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}},
 		bson.M{"$set": bson.M{"overview.aboutme": aboutme}})
 	return err
 }
 
 // AddProject add new project
-func AddProject(uname string, project CVProject) error {
-	collection := client.Database("faculry_portal").Collection("cv")
-	objID := GetCVID(uname)
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+func AddProject(empID string, project CVProject) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}},
 		bson.M{"$push": bson.M{"projects": project}})
 	return err
 }
 
 // DeleteProject delete a project
-func DeleteProject(uname, project string) error {
-	collection := client.Database("faculry_portal").Collection("cv")
-	objID := GetCVID(uname)
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+func DeleteProject(empID, project string) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}},
 		bson.M{"$pull": bson.M{"projects": CVProject{Title: project}}})
 	return err
 }
 
 // AddPrize add new prize
-func AddPrize(uname string, prize CVPrize) error {
-	collection := client.Database("faculry_portal").Collection("cv")
-	objID := GetCVID(uname)
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+func AddPrize(empID string, prize CVPrize) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}},
 		bson.M{"$push": bson.M{"prizes": prize}})
 	return err
 }
 
 // DeletePrize delete a prize
-func DeletePrize(uname, prize string) error {
-	collection := client.Database("faculry_portal").Collection("cv")
-	objID := GetCVID(uname)
-	_, err := collection.UpdateOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}},
+func DeletePrize(empID, prize string) error {
+	collection := client.Database("faculty_portal").Collection("cv")
+	_, err := collection.UpdateOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}},
 		bson.M{"$pull": bson.M{"prizes": CVPrize{Title: prize}}})
 	return err
 }
 
 // GetCVDetails returns cv details
-func GetCVDetails(uname string) (CVDetail, error) {
+func GetCVDetails(empID string) (CVDetail, error) {
 	cvdetail := CVDetail{}
-	collection := client.Database("faculry_portal").Collection("cv")
-	cvID, err := GetFacultyCV(uname)
-	if err != nil {
-		return cvdetail, err
-	}
-	objID, err := primitive.ObjectIDFromHex(cvID)
-	if err != nil {
-		return cvdetail, err
-	}
-	result := collection.FindOne(context.TODO(), bson.M{"_id": bson.M{"$eq": objID}})
+	collection := client.Database("faculty_portal").Collection("cv")
 
-	err = result.Decode(&cvdetail)
+	result := collection.FindOne(context.TODO(), bson.M{"empID": bson.M{"$eq": empID}})
+
+	err := result.Decode(&cvdetail)
 	return cvdetail, err
 }
 
 // CVDetail struct for cv
 type CVDetail struct {
-	Uname    string      `bson:"uname,omitempty"`
+	EmpID    string      `bson:"empID,omitempty"`
 	Overview CVOverview  `bson:"overview,omitempty"`
 	Project  []CVProject `bson:"projects,omitempty"`
 	Prizes   []CVPrize   `bson:"prizes,omitempty"`

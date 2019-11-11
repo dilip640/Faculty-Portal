@@ -29,8 +29,6 @@ func SetupRoutes() {
 	Router.HandleFunc("/profile/{id}", wrapHandlerWithLogging(dashboard.HandleProfile))
 	Router.HandleFunc("/faculty/register",
 		wrapHandlerWithLogging(dashboard.HandleRegisterFaculty))
-	Router.HandleFunc("/faculty/update",
-		wrapHandlerWithLogging(dashboard.HandleUpdateFaculty))
 	Router.HandleFunc("/faculty/editcv",
 		wrapHandlerWithLogging(dashboard.HandleCVEdit))
 }

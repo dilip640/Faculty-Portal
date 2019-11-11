@@ -57,65 +57,28 @@ func HandleRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Faculty  storage.Faculty
-		Employee storage.Employee
-		Error    string
+		Error string
 	}{}
 
-	startDate := r.FormValue("start_date")
-	dept := r.FormValue("dept")
+	if r.Method == http.MethodPost {
+		startDate := r.FormValue("start_date")
+		dept := r.FormValue("dept")
 
-	if startDate != "" && dept != "" {
-		data.Error = "Enter Correct Details!"
-		err := storage.InsertFaculty(userName, startDate, dept)
-		if err == nil {
-			http.Redirect(w, r, "/profile", 302)
-		} else {
-			if err.Error() == "pq: Faculty Exists!" {
+		if startDate != "" && dept != "" {
+			err := storage.InsertFaculty(userName, startDate, dept)
+			if err == nil {
+				http.Redirect(w, r, "/profile", 302)
+			} else {
 				data.Error = "Faculty Exists!"
+				log.Error(err)
 			}
-			log.Error(err)
+		} else {
+			data.Error = "Please enter all the details."
 		}
 	}
 
 	templatemanager.Render(w, userName, data, "base",
 		"templates/faculty/register.html", "templates/base.html")
-}
-
-// HandleUpdateFaculty for update and register faculty
-func HandleUpdateFaculty(w http.ResponseWriter, r *http.Request) {
-	userName := auth.GetUserName(r)
-	if userName == "" {
-		http.Redirect(w, r, "/login", 302)
-	}
-
-	data := struct {
-		Error string
-	}{}
-
-	faculty, err := storage.GetFacultyDetails(userName)
-	if err != nil {
-		log.Error(err)
-	}
-
-	endDate := r.FormValue("end_date")
-	dept := r.FormValue("dept")
-
-	if endDate != "" && dept != "" {
-		data.Error = "Enter Correct Details!"
-		err := storage.UpdateFaculty(userName, faculty.StartDate, endDate, dept)
-		if err == nil {
-			http.Redirect(w, r, "/profile", 302)
-		} else {
-			if err.Error() == "pq: Faculty Exists!" {
-				data.Error = "Faculty Exists!"
-			}
-			log.Error(err)
-		}
-	}
-
-	templatemanager.Render(w, userName, data, "base",
-		"templates/faculty/update.html", "templates/base.html")
 }
 
 // HandleCVEdit for edit cv

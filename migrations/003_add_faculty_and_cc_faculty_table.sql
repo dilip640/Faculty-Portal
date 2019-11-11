@@ -2,10 +2,9 @@
 
 CREATE TABLE faculty
 (
-    emp_id varchar(20) REFERENCES employee (id) UNIQUE,
+    emp_id varchar(20) REFERENCES employee (id) PRIMARY KEY,
     dept_id integer REFERENCES department (id),
-    start_date DATE NOT NULL,
-    PRIMARY KEY(emp_id, dept_id)
+    start_date DATE NOT NULL
 );
 
 CREATE TABLE cc_faculty

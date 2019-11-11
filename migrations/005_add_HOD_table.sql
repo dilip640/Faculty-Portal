@@ -2,15 +2,15 @@
 
 CREATE TABLE hod
 (
-    faculty_id varchar(20) REFERENCES faculty (emp_id) PRIMARY KEY,
-    dept_id integer UNIQUE REFERENCES faculty (dept_id),
+    emp_id varchar(20) REFERENCES employee (id) PRIMARY KEY,
+    dept_id integer REFERENCES department (id) UNIQUE,
     start_date DATE NOT NULL,
     end_date DATE
 );
 
 CREATE TABLE hod_history
 (
-    faculty_id varchar(20) REFERENCES faculty (emp_id) PRIMARY KEY,
+    emp_id varchar(20) PRIMARY KEY,
     dept_id integer,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL

@@ -5,7 +5,7 @@ CREATE TABLE faculty_history
     emp_id varchar(20) PRIMARY KEY,
     dept_id integer,
     start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
+    end_date DATE NOT NULL
 );
 
 CREATE TABLE cc_faculty_history
