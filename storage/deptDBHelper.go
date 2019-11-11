@@ -10,14 +10,14 @@ func InsertDepartment(deptName string) error {
 }
 
 // DeleteDepartment remove dept
-func DeleteDepartment(deptID string) error {
+func DeleteDepartment(deptID int) error {
 	sqlStatement := `DELETE FROM department WHERE id = $1;`
 	_, err := db.Exec(sqlStatement, deptID)
 	return err
 }
 
 // GetDepartment returns one dept
-func GetDepartment(deptID string) (Department, error) {
+func GetDepartment(deptID int) (Department, error) {
 	dept := Department{}
 	sqlStatement := `SELECT id, dept_name FROM department
 						WHERE id = $1`
@@ -40,7 +40,7 @@ func GetAllDepartments() ([]*Department, error) {
 
 	for rows.Next() {
 		var (
-			deptID   string
+			deptID   int
 			deptName string
 		)
 
@@ -56,6 +56,6 @@ func GetAllDepartments() ([]*Department, error) {
 
 // Department struct
 type Department struct {
-	DeptID string
+	DeptID int
 	Name   string
 }

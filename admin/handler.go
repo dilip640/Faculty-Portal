@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
 	"github.com/dilip640/Faculty-Portal/auth"
 	"github.com/dilip640/Faculty-Portal/storage"
@@ -17,6 +18,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 	userName := auth.GetUserName(r)
 	if userName == "" {
 		http.Redirect(w, r, "/login", 302)
+		return
 	}
 
 	if r.Method == http.MethodPost {
@@ -28,11 +30,15 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 		if deptName := reqStruct.AddDept; deptName != nil {
 			err = storage.InsertDepartment(*deptName)
 		} else if deptID := reqStruct.DeleteDept; deptID != nil {
-			err = storage.DeleteDepartment(*deptID)
+			i, _ := strconv.Atoi(*deptID)
+
+			err = storage.DeleteDepartment(i)
 		} else if postName := reqStruct.AddPost; postName != nil {
 			err = storage.InsertPost(*postName)
 		} else if postID := reqStruct.DeletePost; postID != nil {
-			err = storage.DeletePost(*postID)
+			i, _ := strconv.Atoi(*postID)
+
+			err = storage.DeletePost(i)
 		}
 		if err != nil {
 			log.Error(err)

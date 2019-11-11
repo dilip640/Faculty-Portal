@@ -10,14 +10,14 @@ func InsertPost(postName string) error {
 }
 
 // DeleteDepartment remove post
-func DeletePost(postID string) error {
+func DeletePost(postID int) error {
 	sqlStatement := `DELETE FROM post WHERE id = $1;`
 	_, err := db.Exec(sqlStatement, postID)
 	return err
 }
 
 // GetPost returns one post
-func GetPost(postID string) (Post, error) {
+func GetPost(postID int) (Post, error) {
 	post := Post{}
 	sqlStatement := `SELECT id, post_name FROM post
 						WHERE id = $1`
@@ -40,7 +40,7 @@ func GetAllPosts() ([]*Post, error) {
 
 	for rows.Next() {
 		var (
-			postID   string
+			postID   int
 			postName string
 		)
 
@@ -56,6 +56,6 @@ func GetAllPosts() ([]*Post, error) {
 
 // Post struct
 type Post struct {
-	PostID string
+	PostID int
 	Name   string
 }

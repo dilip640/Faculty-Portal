@@ -15,7 +15,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Error    string
+		Error string
 	}{}
 
 	name := r.FormValue("name")
@@ -24,17 +24,17 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		passwd, err := storage.CheckPasswd(name)
 		if err != nil {
 			log.Error(err)
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
+			data.Error = "Invalid Username or Password!"
+		} else {
+			exist := comparePasswords(passwd, pass)
+			if exist {
+				setSession(name, w)
+				http.Redirect(w, r, "/profile", 302)
+			} else {
+				data.Error = "Invalid Username or Password!"
+			}
 		}
 
-		exist := comparePasswords(passwd, pass)
-		if exist {
-			setSession(name, w)
-			http.Redirect(w, r, "/profile", 302)
-		} else {
-			data.Error = "Invalid Username or Password!"
-		}
 	}
 
 	templatemanager.Render(w, GetUserName(r), data, "base", "templates/login.html", "templates/base.html")
@@ -47,7 +47,7 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Error    string
+		Error string
 	}{}
 
 	if r.Method == http.MethodPost {
