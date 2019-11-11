@@ -14,6 +14,17 @@ func DeleteDepartment(deptID string) error {
 	return err
 }
 
+// GetDepartment returns one dept
+func GetDepartment(deptID string) (Department, error) {
+	dept := Department{}
+	sqlStatement := `SELECT id, dept_name FROM department
+						WHERE id = $1`
+	err := db.QueryRow(sqlStatement, deptID).Scan(
+		&dept.DeptID, &dept.Name)
+
+	return dept, err
+}
+
 // GetAllDepartments returns all depts
 func GetAllDepartments() ([]*Department, error) {
 	depts := make([]*Department, 0)

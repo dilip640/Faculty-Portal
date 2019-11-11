@@ -14,10 +14,14 @@
                     <input type="date" name="start_date" id="exampleInputstartdate" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label for="exampleInputdepartment" id="exampleInputdepartment">Department</label>
-                    <input type="text" name="dept" class="form-control" id="exampleInputdepartment"
-                        aria-describedby="emailHelp" placeholder="e.g CSE" required>
+                    <label for="exampleInputdepartment">Department</label>
+                    <select name="dept" class="form-control" id="exampleInputdepartment">
+                        {{range $val := .Data.Departments}}
+                        <option value="{{$val.DeptID}}">{{$val.Name}}</option>
+                        {{end}}
+                    </select>
                 </div>
+
                 <div class="form-group form-check">
                     <input type="checkbox" class="form-check-input" id="exampleCheck1" required>
                     <label class="form-check-label" for="exampleCheck1">Check me out</label>

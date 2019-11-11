@@ -57,7 +57,8 @@ func HandleRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Error string
+		Error       string
+		Departments []*storage.Department
 	}{}
 
 	if r.Method == http.MethodPost {
@@ -67,6 +68,7 @@ func HandleRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 		if startDate != "" && dept != "" {
 			err := storage.InsertFaculty(userName, startDate, dept)
 			if err == nil {
+				storage.CreateCV(userName)
 				http.Redirect(w, r, "/profile", 302)
 			} else {
 				data.Error = "Faculty Exists!"
@@ -75,6 +77,13 @@ func HandleRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 		} else {
 			data.Error = "Please enter all the details."
 		}
+	}
+	depts, err := storage.GetAllDepartments()
+
+	if err == nil {
+		data.Departments = depts
+	} else {
+		log.Error(err)
 	}
 
 	templatemanager.Render(w, userName, data, "base",
