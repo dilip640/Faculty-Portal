@@ -3,6 +3,7 @@ package endpoints
 import (
 	"net/http"
 
+	"github.com/dilip640/Faculty-Portal/admin"
 	"github.com/dilip640/Faculty-Portal/auth"
 	"github.com/dilip640/Faculty-Portal/dashboard"
 	"github.com/gorilla/mux"
@@ -31,4 +32,8 @@ func SetupRoutes() {
 		wrapHandlerWithLogging(dashboard.HandleRegisterFaculty))
 	Router.HandleFunc("/faculty/editcv",
 		wrapHandlerWithLogging(dashboard.HandleCVEdit))
+
+	// Admin routes
+	Router.HandleFunc("/admin",
+		wrapHandlerWithLogging(admin.HandleAdmin))
 }

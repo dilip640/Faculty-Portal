@@ -94,8 +94,6 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, _ := ioutil.ReadAll(r.Body)
 		err = json.Unmarshal(bodyBytes, &reqStruct)
 
-		log.Print(err, reqStruct)
-
 		if bio := reqStruct.Biography; bio != nil {
 			err = storage.SaveBio(userName, *bio)
 		} else if aboutme := reqStruct.AboutMe; aboutme != nil {

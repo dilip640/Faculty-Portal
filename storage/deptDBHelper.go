@@ -1,5 +1,19 @@
 package storage
 
+// InsertDepartment add new dept
+func InsertDepartment(deptName string) error {
+	sqlStatement := `INSERT INTO department (dept_name) VALUES ($1);`
+	_, err := db.Exec(sqlStatement, deptName)
+	return err
+}
+
+// DeleteDepartment remove dept
+func DeleteDepartment(deptID string) error {
+	sqlStatement := `DELETE FROM department WHERE id = $1;`
+	_, err := db.Exec(sqlStatement, deptID)
+	return err
+}
+
 // GetAllDepartments returns all depts
 func GetAllDepartments() ([]*Department, error) {
 	depts := make([]*Department, 0)
