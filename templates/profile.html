@@ -8,15 +8,18 @@
                 <div class="card-header">Basic Details</div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <b>Username : </b>{{.User}}
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <b>Name : </b>{{.Employee.Fname}}
                             {{.Employee.Lname}}
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <b>Email : </b>{{.Employee.Email}}
+                        </div>
+                        <div class="col-md-6">
+                            <b>Number of leaves : </b>{{.Data.NumLeaves}}
                         </div>
                     </div>
                 </div>

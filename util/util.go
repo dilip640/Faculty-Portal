@@ -9,3 +9,8 @@ func DateTimeToDate(dtstr string) string {
 	dtstr2 := dt.Format("02-01-2006")
 	return dtstr2
 }
+
+// GetCurrentYear returns current year
+func GetCurrentYear() int16 {
+	return int16(time.Now().Year())
+}

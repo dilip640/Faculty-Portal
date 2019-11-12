@@ -25,14 +25,22 @@ func HandleProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		CVDetail storage.CVDetail
-		Style    cssparam
-		Self     bool
+		CVDetail  storage.CVDetail
+		Style     cssparam
+		Self      bool
+		NumLeaves int
 	}{Self: self}
 
 	cvdetail, err := storage.GetCVDetails(userName)
 	if err == nil {
 		data.CVDetail = cvdetail
+	} else {
+		log.Error(err)
+	}
+
+	numLeaves, err := storage.GetRemainingLeaves(userName)
+	if err == nil {
+		data.NumLeaves = numLeaves
 	} else {
 		log.Error(err)
 	}
