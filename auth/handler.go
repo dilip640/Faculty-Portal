@@ -31,9 +31,10 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 			if exist {
 				setSession(name, w)
 				http.Redirect(w, r, "/profile", 302)
-			} else {
-				data.Error = "Invalid Username or Password!"
+				return
 			}
+
+			data.Error = "Invalid Username or Password!"
 		}
 
 	}
@@ -63,10 +64,12 @@ func HandleRegister(w http.ResponseWriter, r *http.Request) {
 			if err == nil {
 				setSession(name, w)
 				http.Redirect(w, r, "/profile", 302)
-			} else {
-				log.Error(err)
-				data.Error = "Username Taken!"
+				return
 			}
+
+			log.Error(err)
+			data.Error = "Username Taken!"
+
 		} else {
 			data.Error = "Enter Correct Details!"
 		}

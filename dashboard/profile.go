@@ -63,10 +63,12 @@ func HandleRegisterFaculty(w http.ResponseWriter, r *http.Request) {
 			if err == nil {
 				storage.CreateCV(userName)
 				http.Redirect(w, r, "/profile", 302)
-			} else {
-				data.Error = "Faculty Exists!"
-				log.Error(err)
+				return
 			}
+
+			data.Error = "Faculty Exists!"
+			log.Error(err)
+
 		} else {
 			data.Error = "Please enter all the details."
 		}
@@ -105,10 +107,11 @@ func HandleRegisterCCFaculty(w http.ResponseWriter, r *http.Request) {
 			if err == nil {
 				http.Redirect(w, r, "/profile", 302)
 				return
-			} else {
-				data.Error = "Cross Cutting Faculty Exists!"
-				log.Error(err)
 			}
+
+			data.Error = "Cross Cutting Faculty Exists!"
+			log.Error(err)
+
 		} else {
 			data.Error = "Please enter all the details."
 		}

@@ -137,8 +137,8 @@
             url: '/admin',
             data: jsondata,
             success: function (msg) {
-                $('#alertbox').show().html('changes saved');
-                if (reload)
+                $('#alertbox').show().html(msg + " saving");
+                if (reload && msg == "ok")
                     location.reload()
             },
             error: function (e) {

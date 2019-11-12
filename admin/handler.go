@@ -44,10 +44,10 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 		}
 		if err != nil {
 			log.Error(err)
-			fmt.Fprint(w, struct{ status string }{"error"})
+			fmt.Fprint(w, "error")
 			return
 		}
-		fmt.Fprint(w, struct{ status string }{"ok"})
+		fmt.Fprint(w, "ok")
 		return
 	}
 

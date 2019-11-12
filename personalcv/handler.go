@@ -17,6 +17,7 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 	userName := auth.GetUserName(r)
 	if userName == "" {
 		http.Redirect(w, r, "/login", 302)
+		return
 	}
 
 	if r.Method == http.MethodPost {
@@ -40,10 +41,10 @@ func HandleCVEdit(w http.ResponseWriter, r *http.Request) {
 		}
 		if err != nil {
 			log.Error(err)
-			fmt.Fprint(w, struct{ status string }{"error"})
+			fmt.Fprint(w, "error")
 			return
 		}
-		fmt.Fprint(w, struct{ status string }{"ok"})
+		fmt.Fprint(w, "ok")
 		return
 	}
 
