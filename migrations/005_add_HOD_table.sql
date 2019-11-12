@@ -10,7 +10,7 @@ CREATE TABLE hod
 
 CREATE TABLE hod_history
 (
-    emp_id varchar(20) PRIMARY KEY,
+    emp_id varchar(20),
     dept_id integer,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL
