@@ -9,7 +9,7 @@ func InsertPost(postName string) error {
 	return err
 }
 
-// DeleteDepartment remove post
+// DeletePost remove post
 func DeletePost(postID int) error {
 	sqlStatement := `DELETE FROM post WHERE id = $1;`
 	_, err := db.Exec(sqlStatement, postID)
