@@ -52,8 +52,8 @@
                             {{range .Data.Routes}}
                             <tr>
                                 <td>{{.Applier}}</td>
-                                <td>{{.RouteTo}}</td>
                                 <td>{{.RouteFrom}}</td>
+                                <td>{{.RouteTo}}</td>
                                 <td>{{.CCFPost}}</td>
                                 <td>
                                     <a href="#" onClick="deleteRoute('{{.ID}}');">
@@ -70,7 +70,7 @@
                                     </td>
                                     <td><input type="text" name="routeTo" class="form-control" required>
                                     </td>
-                                    <td><input type="text" name="ccfPost" class="form-control" required>
+                                    <td><input type="text" name="ccfPost" class="form-control">
                                     </td>
                                     <td>
                                         <button class="btn btn-primary" type="submit"><i class="fas fa-plus">
