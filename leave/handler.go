@@ -19,12 +19,13 @@ func HandleLeave(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		noOfDays := r.FormValue("no_of_days")
 		comment := r.FormValue("comment")
+		startDate := r.FormValue("start_date")
 		i, err := strconv.Atoi(noOfDays)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
-		err = requestLeave(i, comment, userName)
+		err = requestLeave(i, startDate, comment, userName)
 		if err != nil {
 			log.Error(err)
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)

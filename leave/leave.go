@@ -5,7 +5,7 @@ import (
 	"github.com/dilip640/Faculty-Portal/storage"
 )
 
-func requestLeave(noOfDays int, comment, empID string) error {
+func requestLeave(noOfDays int, startDate, comment, empID string) error {
 	currLeave, err := storage.GetRemainingLeaves(empID)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func requestLeave(noOfDays int, comment, empID string) error {
 	}
 
 	if noOfDays <= currLeave {
-		err = storage.CreateLeaveApplication(empID, noOfDays, applier, "initialised", comment)
+		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, "initialised", comment)
 	}
 	return err
 }
