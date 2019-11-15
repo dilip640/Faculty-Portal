@@ -2,7 +2,7 @@
 CREATE TABLE leave_application
 (
     id SERIAL UNIQUE,
-    emp_id varchar(20) REFERENCES employee (id) PRIMARY KEY,
+    emp_id varchar(20) REFERENCES employee (id),
     no_of_days integer,
     time_stamp TIMESTAMP DEFAULT NOW(),
     start_date DATE NOT NULL,

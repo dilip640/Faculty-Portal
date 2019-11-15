@@ -24,7 +24,7 @@ func requestLeave(noOfDays int, startDate, comment, empID string) error {
 	}
 
 	if noOfDays <= currLeave {
-		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, "initialised", comment)
+		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, "INITIALIZED", comment)
 	}
 	return err
 }
