@@ -38,33 +38,48 @@
             <div class="card">
                 <div class="card-header">Route Management</div>
                 <div class="card-body">
-                    <table class="table table-dark">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th scope="col">Applier</th>
                                 <th scope="col">Route From</th>
                                 <th scope="col">Route To</th>
                                 <th scope="col">Cross Cutting Faculty Post</th>
-                                <th scope="col">Delete</th>
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{range .Routes}}
+                            {{range .Data.Routes}}
                             <tr>
                                 <td>{{.Applier}}</td>
                                 <td>{{.RouteTo}}</td>
                                 <td>{{.RouteFrom}}</td>
                                 <td>{{.CCFPost}}</td>
                                 <td>
-                                    <a href="#" onClick="deleteRoute('{{.RouteID}}');">
+                                    <a href="#" onClick="deleteRoute('{{.ID}}');">
                                         <i class="fa fa-times" style="color:red" aria-hidden="true">
                                         </i></a>
                                 </td>
                             </tr>
                             {{end}}
+                            <form id="routeform" onsubmit="return addRoute()">
+                                <tr>
+                                    <td><input type="text" name="applier" class="form-control" required>
+                                    </td>
+                                    <td><input type="text" name="routeFrom" class="form-control" required>
+                                    </td>
+                                    <td><input type="text" name="routeTo" class="form-control" required>
+                                    </td>
+                                    <td><input type="text" name="ccfPost" class="form-control" required>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-primary" type="submit"><i class="fas fa-plus">
+                                            </i></button>
+                                    </td>
+                                </tr>
+                            </form>
                         </tbody>
                     </table>
-
                 </div>
             </div>
             <br><br>
@@ -153,10 +168,6 @@
         return false;
     }
 
-    function deleteRoute(routeID) {
-        senddata({ 'deleteRoute': routeID }, true);
-    }
-
     function assignHOD() {
         var formdata = $('#hodform').serializeArray();
         senddata({
@@ -167,6 +178,23 @@
             }
         });
         return false;
+    }
+
+    function addRoute() {
+        var formdata = $('#routeform').serializeArray();
+        senddata({
+            'addRoute': {
+                'applier': formdata[0].value,
+                'route_from': formdata[1].value,
+                'route_to': formdata[2].value,
+                'ccf_post': formdata[3].value,
+            }
+        }, true);
+        return false;
+    }
+
+    function deleteRoute(routeID) {
+        senddata({ 'deleteRoute': routeID }, true);
     }
 
     function senddata(data, reload = false) {

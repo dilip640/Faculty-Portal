@@ -16,8 +16,11 @@ func HandleProfile(w http.ResponseWriter, r *http.Request) {
 	self := true
 	params := mux.Vars(r)
 	if params["id"] != "" {
-		userName = params["id"]
 		self = false
+		if userName == params["id"] {
+			self = true
+		}
+		userName = params["id"]
 	}
 	if userName == "" {
 		http.Redirect(w, r, "/login", 302)

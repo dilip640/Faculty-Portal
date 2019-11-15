@@ -7,12 +7,14 @@ require (
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/mux v1.7.3
 	github.com/gorilla/securecookie v1.1.1
 	github.com/lib/pq v1.2.0
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	github.com/rubenv/sql-migrate v0.0.0-20191022111038-5cdff0d8cc42
 	github.com/sirupsen/logrus v1.4.2
+	github.com/tidwall/pretty v1.0.0 // indirect
 	github.com/urfave/cli v1.22.1
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c // indirect
 	github.com/xdg/stringprep v1.0.0 // indirect

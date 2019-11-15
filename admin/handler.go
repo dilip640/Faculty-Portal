@@ -41,7 +41,14 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 			err = storage.DeletePost(i)
 		} else if hod := reqStruct.AssignHOD; hod != nil {
 			err = storage.InsertHOD(*hod)
+		} else if routID := reqStruct.DeleteRoute; routID != nil {
+			i, _ := strconv.Atoi(*routID)
+
+			err = storage.DeleteRoute(i)
+		} else if route := reqStruct.AddRoute; route != nil {
+			err = storage.InsertRoute(*route)
 		}
+
 		if err != nil {
 			log.Error(err)
 			fmt.Fprint(w, "error")
@@ -54,6 +61,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		Departments []*storage.Department
 		Posts       []*storage.Post
+		Routes      []*storage.Route
 	}{}
 
 	depts, err := storage.GetAllDepartments()
@@ -70,14 +78,23 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 		log.Error(err)
 	}
 
+	routes, err := storage.GetAllRoutes()
+	if err == nil {
+		data.Routes = routes
+	} else {
+		log.Error(err)
+	}
+
 	templatemanager.Render(w, auth.GetUserName(r), data, "base",
 		"templates/admin/index.html", "templates/base.html")
 }
 
 type adminEditRequest struct {
-	DeleteDept *string      `json:"deleteDept"`
-	AddDept    *string      `json:"addDept"`
-	DeletePost *string      `json:"deletePost"`
-	AddPost    *string      `json:"addPost"`
-	AssignHOD  *storage.HOD `json:"assignHOD"`
+	DeleteDept  *string        `json:"deleteDept"`
+	AddDept     *string        `json:"addDept"`
+	DeletePost  *string        `json:"deletePost"`
+	AddPost     *string        `json:"addPost"`
+	AssignHOD   *storage.HOD   `json:"assignHOD"`
+	DeleteRoute *string        `json:"deleteRoute"`
+	AddRoute    *storage.Route `json:"addRoute"`
 }
