@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/dilip640/Faculty-Portal/util"
+	log "github.com/sirupsen/logrus"
 )
 
 // GetRemainingLeaves returns remaining leave
@@ -67,6 +68,40 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 	leaveApplication.StartDate = util.DateTimeToDate(startDate)
 
 	return leaveApplication, err
+}
+
+// GetActiveHodRequests will return all the Leave requests corresponding to that HOD
+func GetActiveHodRequests(deptID string, routes []*Route) ([]*LeaveApplication, error) {
+	reqs := make([]*LeaveApplication, 0)
+	for _, route := range routes {
+		rows, err := db.Query(
+			`SELECT la.id, la.emp_id, la.no_of_days, la.time_stamp, la.applier, 
+				la.route_status, la.status, la.start_date FROM leave_application AS la, faculty AS f 
+				WHERE f.emp_id=la.emp_id AND f.dept_id=$1 AND la.route_status=$2 
+				AND (la.status='PENDING' OR la.status='INITIALIZED')`, deptID, route.RouteFrom)
+		if err != nil {
+			log.Error(err)
+		}
+		defer rows.Close()
+		if err == nil {
+			for rows.Next() {
+				leaveApplication := LeaveApplication{}
+				var startDate string
+
+				if err := rows.Scan(&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
+					&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
+					&leaveApplication.Status, &startDate); err == nil {
+					leaveApplication.StartDate = util.DateTimeToDate(startDate)
+					reqs = append(reqs, &leaveApplication)
+				} else {
+					log.Error(err)
+				}
+			}
+		}
+
+	}
+
+	return reqs, nil
 }
 
 // LeaveApplication struct

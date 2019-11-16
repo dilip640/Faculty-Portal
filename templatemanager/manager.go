@@ -24,6 +24,7 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 		Faculty   storage.Faculty
 		CCFaculty storage.CCFaculty
 		Employee  storage.Employee
+		Hod       storage.HOD
 	}{User: auth, Data: input}
 
 	faculty, err := storage.GetFacultyDetails(auth)
@@ -43,6 +44,13 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 	employee, err := storage.GetEmployeeDetails(auth)
 	if err == nil {
 		data.Employee = employee
+	} else {
+		log.Error(err)
+	}
+
+	hod, err := storage.GetHodDetails(auth)
+	if err == nil {
+		data.Hod = hod
 	} else {
 		log.Error(err)
 	}

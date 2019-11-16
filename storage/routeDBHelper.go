@@ -17,6 +17,32 @@ func DeleteRoute(routeID int) error {
 	return err
 }
 
+// GetRouteStatus returns all the routes corresponding to that person
+func GetRouteStatus(routeTo string) ([]*Route, error) {
+	routes := make([]*Route, 0)
+
+	rows, err := db.Query(
+		`SELECT id, applier, route_from, route_to, ccf_post 
+			FROM application_route WHERE route_to = $1`, routeTo)
+	if err != nil {
+		return routes, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var route Route
+
+		if err := rows.Scan(&route.ID, &route.Applier, &route.RouteFrom, &route.RouteTo,
+			&route.CCFPost); err == nil {
+			routes = append(routes, &route)
+		} else {
+			log.Error(err)
+		}
+	}
+
+	return routes, nil
+}
+
 // GetAllRoutes returns all routes
 func GetAllRoutes() ([]*Route, error) {
 	routes := make([]*Route, 0)

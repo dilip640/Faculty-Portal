@@ -5,7 +5,7 @@
 CREATE FUNCTION assign_hod()
 RETURNS TRIGGER AS $$
 DECLARE 
-    faculty_rec RECORD;
+    faculty_rec faculty%ROWTYPE;
 BEGIN
     SELECT INTO faculty_rec FROM faculty WHERE emp_id=NEW.emp_id;
     IF NOT FOUND THEN

@@ -2,6 +2,7 @@ package leave
 
 import (
 	"errors"
+
 	"github.com/dilip640/Faculty-Portal/storage"
 )
 
@@ -27,4 +28,27 @@ func requestLeave(noOfDays int, startDate, comment, empID string) error {
 		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, "INITIALIZED", comment)
 	}
 	return err
+}
+
+func GetActiveLeaveReqs(empID string) ([]*storage.LeaveApplication, error) {
+	var leaveApplications []*storage.LeaveApplication
+
+	hodDetails, err := storage.GetHodDetails(empID)
+	if err == nil {
+		routes, err := storage.GetRouteStatus("hod")
+		if err != nil {
+			return leaveApplications, err
+		}
+
+		leaveApplications, err = storage.GetActiveHodRequests(hodDetails.DeptID, routes)
+		return leaveApplications, err
+	}
+
+	// ccFacultyDetails, err := storage.GetCCFacultyDetails(empID)
+	// if err == nil {
+
+	// }
+
+	return leaveApplications, err
+
 }
