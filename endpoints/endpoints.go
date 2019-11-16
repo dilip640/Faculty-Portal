@@ -8,6 +8,7 @@ import (
 	"github.com/dilip640/Faculty-Portal/dashboard"
 	"github.com/dilip640/Faculty-Portal/leave"
 	"github.com/dilip640/Faculty-Portal/personalcv"
+	"github.com/dilip640/Faculty-Portal/templatemanager"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -43,4 +44,7 @@ func SetupRoutes() {
 	// Admin routes
 	Router.HandleFunc("/admin",
 		wrapHandlerWithLogging(admin.HandleAdmin))
+
+	// Static files
+	templatemanager.ServeStatic(Router, "./static")
 }

@@ -69,6 +69,7 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 	return leaveApplication, err
 }
 
+// LeaveApplication struct
 type LeaveApplication struct {
 	LeaveID     string
 	EmpID       string

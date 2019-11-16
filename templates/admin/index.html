@@ -9,22 +9,24 @@
                 <div class="card-header">Assign HOD</div>
                 <div class="card-body">
                     <form id="hodform" onsubmit="return assignHOD()">
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputdepartment">Department</label>
-                            <select name="dept" class="form-control" id="exampleInputdepartment">
-                                {{range $val := .Data.Departments}}
-                                <option value="{{$val.DeptID}}">{{$val.Name}}</option>
-                                {{end}}
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="facID" id="facID">Faculty ID</label>
-                            <input type="text" name="facID" class="form-control" id="facID" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="exampleInputstartdate" id="exampleInputstartdate">Start Date</label>
-                            <input type="date" name="start_date" id="exampleInputstartdate" class="form-control"
-                                required>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="exampleInputdepartment">Department</label>
+                                <select name="dept" class="form-control" id="exampleInputdepartment">
+                                    {{range $val := .Data.Departments}}
+                                    <option value="{{$val.DeptID}}">{{$val.Name}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="facID" id="facID">Faculty ID</label>
+                                <input type="text" name="facID" class="form-control" id="facID" required>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="exampleInputstartdate" id="exampleInputstartdate">Start Date</label>
+                                <input type="date" name="start_date" id="exampleInputstartdate" class="form-control"
+                                    required>
+                            </div>
                         </div>
                         <div class="col-md-6"><button class="btn btn-primary" type="submit"><i class="fas fa-plus">
                                     Assign</i></button></div>

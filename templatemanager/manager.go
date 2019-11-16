@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/dilip640/Faculty-Portal/storage"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -52,5 +53,19 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 		log.Error(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
+	}
+}
+
+// ServeStatic to serve static files
+func ServeStatic(router *mux.Router, staticDirectory string) {
+	staticPaths := map[string]string{
+		"css": staticDirectory + "/css/",
+		"js":  staticDirectory + "/js/",
+		"img": staticDirectory + "/img/",
+	}
+	for pathName, pathValue := range staticPaths {
+		pathPrefix := "/" + pathName + "/"
+		router.PathPrefix(pathPrefix).Handler(http.StripPrefix(pathPrefix,
+			http.FileServer(http.Dir(pathValue))))
 	}
 }

@@ -1,0 +1,5 @@
+.list-group { margin-bottom: 0; }
+li.list-group-item {border-radius: 0;border: 0;border-top: 1px solid #ddd;}
+li.list-group-item:hover { background-color: rgb(218, 215, 223); }
+.mic-info { color: #666666;font-size: 11px; }
+.comment-text { font-size: 12px; }
