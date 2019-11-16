@@ -11,7 +11,7 @@
             <div class="card">
                 <div class="card-header">Create Leave Application</div>
                 <div class="card-body">
-                    <form method="POST" action="/leaveapplication">
+                    <form id="leaveform" onsubmit="return applyForLeave()">
                         <div class="form-row">
                             <div class="form-group col-md-5">
                                 <label for="Inputnoleaves">No of Days</label>
@@ -77,23 +77,26 @@
                                     <div class="row">
                                         <div class="col-md-12">
                                             <ul class="list-group">
+                                                {{ range .Data.ActiveLeaveApplication.LeaveCommentHistories}}
                                                 <li class="list-group-item">
                                                     <div class="row">
                                                         <div class="col-xs-10 col-md-11">
                                                             <div>
-                                                                <a
-                                                                    href="http://www.jquery2dotnet.com/2013/10/google-style-login-page-desing-usign.html">
-                                                                    Google Style Login Page Design Using Bootstrap</a>
+                                                                <a href="/profile/{{ .SignedBy }}">{{ .SignedBy }}</a>
                                                                 <div class="mic-info">
-                                                                    By: <a href="#">Bhaumik Patel</a> on 2 Aug 2013
+                                                                    on {{ .Timestamp}}
+                                                                </div>
+                                                                <div class="mic-info">
+                                                                    Status : {{ .Status }}
                                                                 </div>
                                                             </div>
                                                             <div class="comment-text">
-                                                                Awesome design
+                                                                {{ .Comment}}
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </li>
+                                                {{end}}
                                             </ul>
                                         </div>
                                     </div>
@@ -113,60 +116,86 @@
             </div>
         </div>
 
-        {{if or (.Hod) (.CCFaculty)}}
+        {{if or (.Hod.EmpID) (.CCFaculty.EmpID)}}
         <div class="col-md-8 mx-auto">
             <br><br>
-
-            {{if .Data.ActiveLeaveReqs}}
-            {{range .Data.ActiveLeaveReqs}}
-            <div class=" card bg-light mb-3">
+            <div class="card">
+                <div class="card-header">Active Leave Requests</div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <b>Start Date</b> : {{.StartDate}}
-                        </div>
-                        <div class="col-md-6">
-                            <b>No of Days</b> : {{.NumOfDays}}
-                        </div>
-                        <div class="col-md-6">
-                            <b>Route Status</b> : {{.RouteStatus}}
-                        </div>
-                        <div class="col-md-6">
-                            <b>Approval Status</b> : {{.Status}}
-                        </div>
-                        <div class="col-md-6">
-                            <b>Time Stamp</b> : {{.Timestamp}}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <ul class="list-group">
-                                <li class="list-group-item">
-                                    <div class="row">
-                                        <div class="col-xs-10 col-md-11">
-                                            <div>
-                                                <a
-                                                    href="http://www.jquery2dotnet.com/2013/10/google-style-login-page-desing-usign.html">
-                                                    Google Style Login Page Design Using Bootstrap</a>
-                                                <div class="mic-info">
-                                                    By: <a href="#">Bhaumik Patel</a> on 2 Aug 2013
+                    {{if .Data.ActiveLeaveReqs}}
+                    {{range .Data.ActiveLeaveReqs}}
+                    <div class=" card bg-light mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <b>Employee ID</b> : {{.EmpID}}
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Start Date</b> : {{.StartDate}}
+                                </div>
+                                <div class="col-md-6">
+                                    <b>No of Days</b> : {{.NumOfDays}}
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Route Status</b> : {{.RouteStatus}}
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Approval Status</b> : {{.Status}}
+                                </div>
+                                <div class="col-md-6">
+                                    <b>Time Stamp</b> : {{.Timestamp}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul class="list-group">
+                                        {{ range .LeaveCommentHistories}}
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-xs-10 col-md-11">
+                                                    <div>
+                                                        <a href="/profile/{{ .SignedBy }}">{{ .SignedBy }}</a>
+                                                        <div class="mic-info">
+                                                            on {{ .Timestamp}}
+                                                        </div>
+                                                        <div class="mic-info">
+                                                            Status : {{ .Status }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="comment-text">
+                                                        {{ .Comment}}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="comment-text">
-                                                Awesome design
+                                        </li>
+                                        {{end}}
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-xs-10 col-md-11">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <label for="Inputcomment">Comment</label>
+                                                            <textarea name="comment" class="form-control"
+                                                                id="Inputcomment" placeholder="Add comment..."
+                                                                required></textarea>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary">Add Comment</button>
+                                                    </form>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    {{end}}
+                    {{else}}
+                    Currently no leave requests in queue.
+                    {{end}}
                 </div>
             </div>
-            {{end}}
-            {{else}}
-            Currently no leave requests in queue.
-            {{end}}
+            <br><br>
         </div>
         {{end}}
     </div>
@@ -174,4 +203,37 @@
     <p><a href="/login">Click Here</a> to login or <a href="/register">register</a></p>
     {{end}}
 </div>
+{{end}}
+
+{{define "js"}}
+<script>
+    function applyForLeave() {
+        var formdata = $('#leaveform').serializeArray();
+        senddata({
+            'applyForLeave': {
+                'no_of_days': formdata[0].value,
+                'start_date': formdata[1].value,
+                'comment': formdata[2].value,
+            }
+        }, true);
+        return false;
+    }
+
+    function senddata(data, reload = false) {
+        var jsondata = JSON.stringify(data);
+        $.ajax({
+            type: 'POST',
+            url: '/leaveapplication',
+            data: jsondata,
+            success: function (msg) {
+                alert(msg);
+                if (reload && msg == "ok")
+                    location.reload()
+            },
+            error: function (e) {
+                alert('error saving');
+            }
+        });
+    }
+</script>
 {{end}}

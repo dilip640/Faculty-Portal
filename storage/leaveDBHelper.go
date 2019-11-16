@@ -66,6 +66,7 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 		&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
 		&leaveApplication.Status, &startDate)
 	leaveApplication.StartDate = util.DateTimeToDate(startDate)
+	leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
 
 	return leaveApplication, err
 }
@@ -92,6 +93,7 @@ func GetActiveHodRequests(deptID string, routes []*Route) ([]*LeaveApplication, 
 					&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
 					&leaveApplication.Status, &startDate); err == nil {
 					leaveApplication.StartDate = util.DateTimeToDate(startDate)
+					leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
 					reqs = append(reqs, &leaveApplication)
 				} else {
 					log.Error(err)
@@ -104,14 +106,52 @@ func GetActiveHodRequests(deptID string, routes []*Route) ([]*LeaveApplication, 
 	return reqs, nil
 }
 
+// GetLeaveCommentHistory returns all comment history of give application id
+func GetLeaveCommentHistory(LeaveID string) ([]*LeaveCommentHistory, error) {
+	leaveCommentHistories := make([]*LeaveCommentHistory, 0)
+
+	rows, err := db.Query(
+		`SELECT leave_id, signed_by, comment, status, time_stamp FROM leave_comment_history
+					WHERE leave_id=$1`, LeaveID)
+	if err != nil {
+		return leaveCommentHistories, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		leaveCommentHistory := LeaveCommentHistory{}
+
+		if err := rows.Scan(&leaveCommentHistory.LeaveID, &leaveCommentHistory.SignedBy,
+			&leaveCommentHistory.Comment, &leaveCommentHistory.Status,
+			&leaveCommentHistory.Timestamp); err == nil {
+
+			leaveCommentHistories = append(leaveCommentHistories, &leaveCommentHistory)
+		} else {
+			log.Error(err)
+		}
+	}
+
+	return leaveCommentHistories, nil
+}
+
 // LeaveApplication struct
 type LeaveApplication struct {
-	LeaveID     string
-	EmpID       string
-	NumOfDays   int
-	Timestamp   string
-	Applier     string
-	RouteStatus string
-	Status      string
-	StartDate   string
+	LeaveID               string
+	EmpID                 string
+	NumOfDays             int
+	Timestamp             string
+	Applier               string
+	RouteStatus           string
+	Status                string
+	StartDate             string
+	LeaveCommentHistories []*LeaveCommentHistory
+}
+
+// LeaveCommentHistory struct
+type LeaveCommentHistory struct {
+	LeaveID   string
+	SignedBy  string
+	Comment   string
+	Status    string
+	Timestamp string
 }

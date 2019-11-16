@@ -1,6 +1,9 @@
 package leave
 
 import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 
@@ -17,23 +20,38 @@ func HandleLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
-		noOfDays := r.FormValue("no_of_days")
-		comment := r.FormValue("comment")
-		startDate := r.FormValue("start_date")
-		i, err := strconv.Atoi(noOfDays)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-			return
+		var response string
+		var err error
+		var reqStruct leaveRequest
+		bodyBytes, _ := ioutil.ReadAll(r.Body)
+		err = json.Unmarshal(bodyBytes, &reqStruct)
+
+		if applyLeaveData := reqStruct.ApplyForLeave; applyLeaveData != nil {
+			i, _ := strconv.Atoi(*applyLeaveData.NoOfDays)
+			err = requestLeave(i, *applyLeaveData.StartDate, *applyLeaveData.Comment, userName)
+			if err != nil {
+				response = "You Have Already an active application!"
+			}
 		}
-		err = requestLeave(i, startDate, comment, userName)
+
 		if err != nil {
 			log.Error(err)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			fmt.Fprint(w, response)
 			return
 		}
-		http.Error(w, http.StatusText(http.StatusOK), http.StatusOK)
+		fmt.Fprint(w, "ok")
 		return
 	}
 
 	http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+}
+
+type leaveRequest struct {
+	ApplyForLeave *applyLeaveRequest `json:"applyForLeave"`
+}
+
+type applyLeaveRequest struct {
+	NoOfDays  *string `json:"no_of_days"`
+	StartDate *string `json:"start_date"`
+	Comment   *string `json:"comment"`
 }
