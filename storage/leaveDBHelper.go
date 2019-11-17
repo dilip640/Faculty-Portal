@@ -27,6 +27,14 @@ func GetRemainingLeaves(empID string, y ...int) (int, error) {
 	return numLeaves, err
 }
 
+// DeductLeave deduct of an employee
+func DeductLeave(empID string, year, days int) error {
+	_, err := db.Exec(`UPDATE leave SET no_of_leaves = no_of_leaves - $1 WHERE emp_id = $2 AND year = $3`,
+		days, empID, year)
+
+	return err
+}
+
 // CreateLeaveApplication create new leave
 func CreateLeaveApplication(empID string, noOfDays int, startDate, applier, routeStatus, status, comment string) error {
 	tx, err := db.Begin()
