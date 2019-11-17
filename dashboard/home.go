@@ -16,6 +16,7 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		ActiveLeaveApplication storage.LeaveApplication
+		PastLeaveApplications  []*storage.LeaveApplication
 		ActiveLeaveReqs        []*storage.LeaveApplication
 	}{}
 
@@ -23,6 +24,13 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 		activeLeaveApplication, err := storage.GetActiveApplication(userName)
 		if err == nil {
 			data.ActiveLeaveApplication = activeLeaveApplication
+		} else {
+			log.Error(err)
+		}
+
+		pastLeaveApplications, err := storage.GetPastApplications(userName)
+		if err == nil {
+			data.PastLeaveApplications = pastLeaveApplications
 		} else {
 			log.Error(err)
 		}

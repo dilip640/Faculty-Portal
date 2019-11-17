@@ -60,7 +60,7 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 	leaveApplication := LeaveApplication{}
 	sqlStatement := `SELECT id, emp_id, no_of_days, time_stamp, applier, 
 						route_status, status, start_date FROM leave_application
-						WHERE emp_id = $1`
+						WHERE emp_id = $1 AND (status='PENDING' OR status='INITIALIZED')`
 	err := db.QueryRow(sqlStatement, empID).Scan(
 		&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
 		&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
@@ -69,6 +69,37 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 	leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
 
 	return leaveApplication, err
+}
+
+// GetPastApplications returns the past application.
+func GetPastApplications(empID string) ([]*LeaveApplication, error) {
+	leaveApplications := make([]*LeaveApplication, 0)
+
+	sqlStatement := `SELECT id, emp_id, no_of_days, time_stamp, applier, 
+						route_status, status, start_date FROM leave_application
+						WHERE emp_id = $1 AND NOT (status='PENDING' OR status='INITIALIZED')`
+	rows, err := db.Query(sqlStatement, empID)
+
+	if err != nil {
+		return leaveApplications, err
+	}
+
+	for rows.Next() {
+		leaveApplication := LeaveApplication{}
+		var startDate string
+
+		if err := rows.Scan(&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
+			&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
+			&leaveApplication.Status, &startDate); err == nil {
+			leaveApplication.StartDate = util.DateTimeToDate(startDate)
+			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplications = append(leaveApplications, &leaveApplication)
+		} else {
+			log.Error(err)
+		}
+	}
+
+	return leaveApplications, nil
 }
 
 // GetLeaveApplication retuns LeaveApplication

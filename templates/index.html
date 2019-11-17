@@ -36,7 +36,6 @@
         </div>
         <div class="col-md-8 mx-auto">
             <br><br>
-
             <div class="card">
                 <div class="card-header">
                     <ul class="nav nav-tabs card-header-tabs" role="tablist">
@@ -97,6 +96,25 @@
                                                     </div>
                                                 </li>
                                                 {{end}}
+                                                {{ if eq .Data.ActiveLeaveApplication.Applier .Data.ActiveLeaveApplication.RouteStatus }}
+                                                <div class="row">
+                                                    <div class="col-xs-10 col-md-11">
+                                                        <div class="form-group">
+                                                            <label for="Inputcommentreply{{ .Data.ActiveLeaveApplication.LeaveID}}">Comment</label>
+                                                            <textarea class="form-control"
+                                                                id="Inputcommentreply{{ .Data.ActiveLeaveApplication.LeaveID}}"
+                                                                placeholder="Add comment..." required></textarea>
+                                                        </div>
+                                                        <div class="form-row">
+                                                            <div class="col-md-3">
+                                                                <button
+                                                                    onclick="commentLeaveReq('add_comment', '{{ .Data.ActiveLeaveApplication.LeaveID}}')"
+                                                                    class="btn btn-primary">Add Comment</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {{ end }}
                                             </ul>
                                         </div>
                                     </div>
@@ -108,6 +126,59 @@
 
                         </div>
                         <div id="pastApplications" class="container tab-pane fade"><br>
+                            {{if .Data.PastLeaveApplications}}
+                            {{range .Data.PastLeaveApplications}}
+                            <div class=" card bg-light mb-3">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <b>Start Date</b> : {{.StartDate}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <b>No of Days</b> : {{.NumOfDays}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <b>Route Status</b> : {{.RouteStatus}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <b>Approval Status</b> : {{.Status}}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <b>Time Stamp</b> : {{.Timestamp}}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <ul class="list-group">
+                                                {{ range .LeaveCommentHistories}}
+                                                <li class="list-group-item">
+                                                    <div class="row">
+                                                        <div class="col-xs-10 col-md-11">
+                                                            <div>
+                                                                <a href="/profile/{{ .SignedBy }}">{{ .SignedBy }}</a>
+                                                                <div class="mic-info">
+                                                                    on {{ .Timestamp}}
+                                                                </div>
+                                                                <div class="mic-info">
+                                                                    Status : {{ .Status }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="comment-text">
+                                                                {{ .Comment}}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                {{end}}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{end}}
+                            {{else}}
+                            No Past Leave Applications!
+                            {{end}}
                         </div>
                     </div>
                 </div>
@@ -171,29 +242,25 @@
                                         {{end}}
                                         <div class="row">
                                             <div class="col-xs-10 col-md-11">
-                                                <form id="leavereqform" onsubmit="return commentLeaveReq()">
-                                                    <div class="form-group">
-                                                        <label for="Inputcommentreply">Comment</label>
-                                                        <textarea name="comment" class="form-control"
-                                                            id="Inputcommentreply" placeholder="Add comment..."
-                                                            required></textarea>
+                                                <div class="form-group">
+                                                    <label for="Inputcommentreply{{ .LeaveID}}">Comment</label>
+                                                    <textarea class="form-control" id="Inputcommentreply{{ .LeaveID}}"
+                                                        placeholder="Add comment..." required></textarea>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="col-md-3">
+                                                        <button onclick="commentLeaveReq('send_back', '{{ .LeaveID}}')"
+                                                            class="btn btn-primary">Send Back</button>
                                                     </div>
-                                                    <input type="hidden" name="leave_id" value="{{ .LeaveID}}" />
-                                                    <div class="form-row">
-                                                        <div class="col-md-3">
-                                                            <button type="submit" name="action" value="send_back"
-                                                                class="btn btn-primary">Send Back</button>
-                                                        </div>
-                                                        <div class="col-md-2">
-                                                            <button type="submit"
-                                                                class="btn btn-success">Approve</button>
-                                                        </div>
-                                                        <div class="col-md-2 ml-auto">
-                                                            <button type="submit" name="action" value="disapprove"
-                                                                class="btn btn-danger">Disapprove</button>
-                                                        </div>
+                                                    <div class="col-md-2">
+                                                        <button onclick="commentLeaveReq('approve', '{{ .LeaveID}}')"
+                                                            class="btn btn-success">Approve</button>
                                                     </div>
-                                                </form>
+                                                    <div class="col-md-2 ml-auto">
+                                                        <button onclick="commentLeaveReq('disapprove', '{{ .LeaveID}}')"
+                                                            class="btn btn-danger">Disapprove</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </ul>
@@ -219,16 +286,18 @@
 
 {{define "js"}}
 <script>
-    function commentLeaveReq() {
-        var formdata = $('#leavereqform').serializeArray();
-        senddata({
-            'commentLeaveReq': {
-                'comment': formdata[0].value,
-                'leave_id': formdata[1].value,
-                'action': formdata[2].value,
-            }
-        }, true);
-        return false;
+    function commentLeaveReq(action, id) {
+
+        if ($('#Inputcommentreply' + id).val().trim() == "")
+            $('#Inputcommentreply' + id).focus();
+        else
+            senddata({
+                'commentLeaveReq': {
+                    'comment': $('#Inputcommentreply' + id).val(),
+                    'leave_id': id,
+                    'action': action,
+                }
+            }, true);
     }
 
     function applyForLeave() {

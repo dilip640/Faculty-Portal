@@ -18,9 +18,11 @@
                         <div class="col-md-6">
                             <b>Email : </b>{{.Employee.Email}}
                         </div>
+                        {{ if .Data.Self }}
                         <div class="col-md-6">
                             <b>Number of leaves : </b>{{.Data.NumLeaves}}
                         </div>
+                        {{ end }}
                     </div>
                 </div>
             </div><br><br>

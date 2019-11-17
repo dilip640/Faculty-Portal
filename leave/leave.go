@@ -75,7 +75,7 @@ func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory) error {
 	} else if leaveCommentHistory.Status == "approve" {
 		routeStatus, err := storage.GetRouteStatusTo(leaveApplication.Applier, leaveApplication.RouteStatus)
 		if err == sql.ErrNoRows {
-			err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteFrom, "APPROVED", leaveCommentHistory)
+			err = storage.CommentAndChangeLeaveStatus(leaveApplication.RouteStatus, "APPROVED", leaveCommentHistory)
 			if err != nil {
 				return err
 			}
@@ -85,12 +85,22 @@ func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory) error {
 			return err
 		}
 
-		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteFrom, "PENDING", leaveCommentHistory)
+		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteTo, "PENDING", leaveCommentHistory)
 		if err != nil {
 			return err
 		}
 	} else if leaveCommentHistory.Status == "disapprove" {
 		err = storage.CommentAndChangeLeaveStatus(leaveApplication.RouteStatus, "DISAPPROVED", leaveCommentHistory)
+		if err != nil {
+			return err
+		}
+	} else if leaveCommentHistory.Status == "add_comment" {
+		routeStatus, err := storage.GetRouteStatusTo(leaveApplication.Applier, leaveApplication.RouteStatus)
+		if err != nil {
+			return err
+		}
+
+		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteTo, "PENDING", leaveCommentHistory)
 		if err != nil {
 			return err
 		}
