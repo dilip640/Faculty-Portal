@@ -169,21 +169,33 @@
                                             </div>
                                         </li>
                                         {{end}}
-                                        <li class="list-group-item">
-                                            <div class="row">
-                                                <div class="col-xs-10 col-md-11">
-                                                    <form>
-                                                        <div class="form-group">
-                                                            <label for="Inputcomment">Comment</label>
-                                                            <textarea name="comment" class="form-control"
-                                                                id="Inputcomment" placeholder="Add comment..."
-                                                                required></textarea>
+                                        <div class="row">
+                                            <div class="col-xs-10 col-md-11">
+                                                <form id="leavereqform" onsubmit="return commentLeaveReq()">
+                                                    <div class="form-group">
+                                                        <label for="Inputcommentreply">Comment</label>
+                                                        <textarea name="comment" class="form-control"
+                                                            id="Inputcommentreply" placeholder="Add comment..."
+                                                            required></textarea>
+                                                    </div>
+                                                    <input type="hidden" name="leave_id" value="{{ .LeaveID}}" />
+                                                    <div class="form-row">
+                                                        <div class="col-md-3">
+                                                            <button type="submit" name="action" value="send_back"
+                                                                class="btn btn-primary">Send Back</button>
                                                         </div>
-                                                        <button type="submit" class="btn btn-primary">Add Comment</button>
-                                                    </form>
-                                                </div>
+                                                        <div class="col-md-2">
+                                                            <button type="submit"
+                                                                class="btn btn-success">Approve</button>
+                                                        </div>
+                                                        <div class="col-md-2 ml-auto">
+                                                            <button type="submit" name="action" value="disapprove"
+                                                                class="btn btn-danger">Disapprove</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </li>
+                                        </div>
                                     </ul>
                                 </div>
                             </div>
@@ -207,6 +219,18 @@
 
 {{define "js"}}
 <script>
+    function commentLeaveReq() {
+        var formdata = $('#leavereqform').serializeArray();
+        senddata({
+            'commentLeaveReq': {
+                'comment': formdata[0].value,
+                'leave_id': formdata[1].value,
+                'action': formdata[2].value,
+            }
+        }, true);
+        return false;
+    }
+
     function applyForLeave() {
         var formdata = $('#leaveform').serializeArray();
         senddata({

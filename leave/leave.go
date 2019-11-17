@@ -1,6 +1,7 @@
 package leave
 
 import (
+	"database/sql"
 	"errors"
 
 	"github.com/dilip640/Faculty-Portal/storage"
@@ -25,22 +26,22 @@ func requestLeave(noOfDays int, startDate, comment, empID string) error {
 	}
 
 	if noOfDays <= currLeave {
-		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, "INITIALIZED", comment)
+		route, err := storage.GetRouteStatusTo(applier, applier)
+		if err != nil {
+			return err
+		}
+		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, route.RouteTo, "INITIALIZED", comment)
 	}
 	return err
 }
 
+// GetActiveLeaveReqs returns leave requests
 func GetActiveLeaveReqs(empID string) ([]*storage.LeaveApplication, error) {
 	var leaveApplications []*storage.LeaveApplication
 
 	hodDetails, err := storage.GetHodDetails(empID)
 	if err == nil {
-		routes, err := storage.GetRouteStatus("hod")
-		if err != nil {
-			return leaveApplications, err
-		}
-
-		leaveApplications, err = storage.GetActiveHodRequests(hodDetails.DeptID, routes)
+		leaveApplications, err = storage.GetActiveHodRequests(hodDetails.DeptID, "hod")
 		return leaveApplications, err
 	}
 
@@ -51,4 +52,51 @@ func GetActiveLeaveReqs(empID string) ([]*storage.LeaveApplication, error) {
 
 	return leaveApplications, err
 
+}
+
+// ValidateComment validate comment and add to application
+func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory) error {
+	leaveApplication, err := storage.GetLeaveApplication(leaveCommentHistory.LeaveID)
+	if err != nil {
+		return err
+	}
+
+	if leaveCommentHistory.Status == "send_back" {
+		routeStatus, err := storage.GetRouteStatusFrom(leaveApplication.Applier, leaveApplication.RouteStatus)
+		if err != nil {
+			return err
+		}
+
+		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteFrom, "PENDING", leaveCommentHistory)
+		if err != nil {
+			return err
+		}
+
+	} else if leaveCommentHistory.Status == "approve" {
+		routeStatus, err := storage.GetRouteStatusTo(leaveApplication.Applier, leaveApplication.RouteStatus)
+		if err == sql.ErrNoRows {
+			err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteFrom, "APPROVED", leaveCommentHistory)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		} else if err != nil {
+			return err
+		}
+
+		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteFrom, "PENDING", leaveCommentHistory)
+		if err != nil {
+			return err
+		}
+	} else if leaveCommentHistory.Status == "disapprove" {
+		err = storage.CommentAndChangeLeaveStatus(leaveApplication.RouteStatus, "DISAPPROVED", leaveCommentHistory)
+		if err != nil {
+			return err
+		}
+	} else {
+		return errors.New("Invalid Opertion")
+	}
+
+	return nil
 }

@@ -28,7 +28,7 @@ func GetRemainingLeaves(empID string, y ...int) (int, error) {
 }
 
 // CreateLeaveApplication create new leave
-func CreateLeaveApplication(empID string, noOfDays int, startDate, applier, status, comment string) error {
+func CreateLeaveApplication(empID string, noOfDays int, startDate, applier, routeStatus, status, comment string) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -36,7 +36,7 @@ func CreateLeaveApplication(empID string, noOfDays int, startDate, applier, stat
 
 	_, err = tx.Exec(`INSERT INTO leave_application(emp_id, no_of_days, start_date, 
 				applier, route_status, status)
-				VALUES($1, $2, $3, $4, $4, $5);`, empID, noOfDays, startDate, applier, status)
+				VALUES($1, $2, $3, $4, $5, $6);`, empID, noOfDays, startDate, applier, routeStatus, status)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -71,34 +71,48 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 	return leaveApplication, err
 }
 
+// GetLeaveApplication retuns LeaveApplication
+func GetLeaveApplication(leavID int) (LeaveApplication, error) {
+	var leaveApplication LeaveApplication
+
+	sqlStatement := `SELECT id, emp_id, no_of_days, time_stamp, applier, 
+						route_status, status, start_date FROM leave_application
+						WHERE id = $1`
+	err := db.QueryRow(sqlStatement, leavID).Scan(
+		&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
+		&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
+		&leaveApplication.Status, &leaveApplication.StartDate)
+	leaveApplication.StartDate = util.DateTimeToDate(leaveApplication.StartDate)
+	leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+
+	return leaveApplication, err
+}
+
 // GetActiveHodRequests will return all the Leave requests corresponding to that HOD
-func GetActiveHodRequests(deptID string, routes []*Route) ([]*LeaveApplication, error) {
+func GetActiveHodRequests(deptID string, routeStatus string) ([]*LeaveApplication, error) {
 	reqs := make([]*LeaveApplication, 0)
-	for _, route := range routes {
-		rows, err := db.Query(
-			`SELECT la.id, la.emp_id, la.no_of_days, la.time_stamp, la.applier, 
+	rows, err := db.Query(
+		`SELECT la.id, la.emp_id, la.no_of_days, la.time_stamp, la.applier, 
 				la.route_status, la.status, la.start_date FROM leave_application AS la, faculty AS f 
 				WHERE f.emp_id=la.emp_id AND f.dept_id=$1 AND la.route_status=$2 
-				AND (la.status='PENDING' OR la.status='INITIALIZED')`, deptID, route.RouteFrom)
-		if err != nil {
-			log.Error(err)
-		}
-		defer rows.Close()
-		if err == nil {
-			for rows.Next() {
-				leaveApplication := LeaveApplication{}
-				var startDate string
+				AND (la.status='PENDING' OR la.status='INITIALIZED')`, deptID, routeStatus)
+	if err != nil {
+		return reqs, err
+	}
+	defer rows.Close()
 
-				if err := rows.Scan(&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
-					&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
-					&leaveApplication.Status, &startDate); err == nil {
-					leaveApplication.StartDate = util.DateTimeToDate(startDate)
-					leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
-					reqs = append(reqs, &leaveApplication)
-				} else {
-					log.Error(err)
-				}
-			}
+	for rows.Next() {
+		leaveApplication := LeaveApplication{}
+		var startDate string
+
+		if err := rows.Scan(&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
+			&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
+			&leaveApplication.Status, &startDate); err == nil {
+			leaveApplication.StartDate = util.DateTimeToDate(startDate)
+			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			reqs = append(reqs, &leaveApplication)
+		} else {
+			log.Error(err)
 		}
 
 	}
@@ -107,7 +121,7 @@ func GetActiveHodRequests(deptID string, routes []*Route) ([]*LeaveApplication, 
 }
 
 // GetLeaveCommentHistory returns all comment history of give application id
-func GetLeaveCommentHistory(LeaveID string) ([]*LeaveCommentHistory, error) {
+func GetLeaveCommentHistory(LeaveID int) ([]*LeaveCommentHistory, error) {
 	leaveCommentHistories := make([]*LeaveCommentHistory, 0)
 
 	rows, err := db.Query(
@@ -134,9 +148,35 @@ func GetLeaveCommentHistory(LeaveID string) ([]*LeaveCommentHistory, error) {
 	return leaveCommentHistories, nil
 }
 
+// CommentAndChangeLeaveStatus handle comment
+func CommentAndChangeLeaveStatus(routeStatus, status string, leaveCommentHistory LeaveCommentHistory) error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec(`UPDATE leave_application SET route_status = $1, status = $2
+						WHERE id = $3;`, routeStatus, status, leaveCommentHistory.LeaveID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec(`INSERT INTO leave_comment_history(leave_id, signed_by, comment, status)
+				VALUES($1, $2, $3, $4);`, leaveCommentHistory.LeaveID, leaveCommentHistory.SignedBy,
+		leaveCommentHistory.Comment, leaveCommentHistory.Status)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Commit()
+	return err
+}
+
 // LeaveApplication struct
 type LeaveApplication struct {
-	LeaveID               string
+	LeaveID               int
 	EmpID                 string
 	NumOfDays             int
 	Timestamp             string
@@ -149,7 +189,7 @@ type LeaveApplication struct {
 
 // LeaveCommentHistory struct
 type LeaveCommentHistory struct {
-	LeaveID   string
+	LeaveID   int
 	SignedBy  string
 	Comment   string
 	Status    string
