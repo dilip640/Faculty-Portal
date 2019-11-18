@@ -134,7 +134,8 @@ func GetActiveHodRequests(deptID string, routeStatus string) ([]*LeaveApplicatio
 		`SELECT la.id, la.emp_id, la.no_of_days, la.time_stamp, la.applier, 
 				la.route_status, la.status, la.start_date FROM leave_application AS la, faculty AS f 
 				WHERE f.emp_id=la.emp_id AND f.dept_id=$1 AND la.route_status=$2 
-				AND (la.status='PENDING' OR la.status='INITIALIZED')`, deptID, routeStatus)
+				AND (la.status='PENDING' OR la.status='INITIALIZED') 
+				AND la.applier <> 'hod'`, deptID, routeStatus)
 	if err != nil {
 		return reqs, err
 	}
@@ -149,6 +150,7 @@ func GetActiveHodRequests(deptID string, routeStatus string) ([]*LeaveApplicatio
 			&leaveApplication.Status, &startDate); err == nil {
 			leaveApplication.StartDate = util.DateTimeToDate(startDate)
 			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+
 			reqs = append(reqs, &leaveApplication)
 		} else {
 			log.Error(err)
@@ -213,6 +215,10 @@ func CommentAndChangeLeaveStatus(routeStatus, status string, leaveCommentHistory
 	return err
 }
 
+func GetBorrowedLeaves(empID string, numOfDays int) {
+
+}
+
 // LeaveApplication struct
 type LeaveApplication struct {
 	LeaveID               int
@@ -224,6 +230,7 @@ type LeaveApplication struct {
 	Status                string
 	StartDate             string
 	LeaveCommentHistories []*LeaveCommentHistory
+	borrowedDays          int
 }
 
 // LeaveCommentHistory struct
