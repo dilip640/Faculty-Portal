@@ -57,7 +57,7 @@
             success: function (msg) {
                 $('#alertbox').show().html(msg + " saving");
                 if (reload && msg == "ok")
-                    location.reload()
+                    location.reload();
             },
             error: function (e) {
                 $('#alertbox').show().html('error saving');

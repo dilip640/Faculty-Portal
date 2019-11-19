@@ -7,7 +7,7 @@ RETURNS TRIGGER AS $$
 DECLARE 
     leave_rec RECORD;
 BEGIN
-    SELECT INTO leave_rec FROM leave_application WHERE emp_id=NEW.emp_id 
+    SELECT * INTO leave_rec FROM leave_application WHERE emp_id=NEW.emp_id 
         AND (status='INITIALIZED' OR status='PENDING');
     IF FOUND THEN
         RAISE EXCEPTION 'You already have one leave in Progress!';
