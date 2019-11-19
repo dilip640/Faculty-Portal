@@ -5,13 +5,20 @@ import (
 	"errors"
 
 	"github.com/dilip640/Faculty-Portal/storage"
+	"github.com/dilip640/Faculty-Portal/util"
 )
 
 func requestLeave(noOfDays int, startDate, comment, empID string) error {
-	currLeave, err := storage.GetRemainingLeaves(empID)
+	currLeave, err := storage.GetRemainingLeaves(empID, util.DateTToYear(startDate))
 	if err != nil {
 		return err
 	}
+
+	nxtLeave, err := storage.GetRemainingLeaves(empID, util.DateTToYear(startDate)+1)
+	if err != nil {
+		return err
+	}
+
 	var applier string
 
 	_, err = storage.GetCCFacultyDetails(empID)
@@ -25,14 +32,22 @@ func requestLeave(noOfDays int, startDate, comment, empID string) error {
 		return errors.New("Nhi milegi")
 	}
 
-	if noOfDays <= currLeave {
-		route, err := storage.GetRouteStatusTo(applier, applier)
-		if err != nil {
-			return err
-		}
-		err = storage.CreateLeaveApplication(empID, noOfDays, startDate, applier, route.RouteTo, "INITIALIZED", comment)
+	route, err := storage.GetRouteStatusTo(applier, applier)
+	if err != nil {
+		return err
 	}
-	return err
+
+	if noOfDays <= currLeave+nxtLeave {
+		borrowedDays := 0
+		if noOfDays > currLeave {
+			borrowedDays = noOfDays - currLeave
+		}
+		err = storage.CreateLeaveApplication(empID, noOfDays, borrowedDays, startDate, applier,
+			route.RouteTo, "INITIALIZED", comment)
+		return err
+	}
+
+	return errors.New("Itni chhutti nhi milegi")
 }
 
 // GetActiveLeaveReqs returns leave requests
@@ -56,32 +71,33 @@ func GetActiveLeaveReqs(empID string) ([]*storage.LeaveApplication, error) {
 }
 
 // ValidateComment validate comment and add to application
-func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory) error {
+func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory, borrowAlowed bool) error {
 	leaveApplication, err := storage.GetLeaveApplication(leaveCommentHistory.LeaveID)
 	if err != nil {
 		return err
 	}
 
 	if leaveCommentHistory.Status == "send_back" {
-		routeStatus, err := storage.GetRouteStatusFrom(leaveApplication.Applier, leaveApplication.RouteStatus)
-		if err != nil {
-			return err
-		}
-
-		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteFrom, "PENDING", leaveCommentHistory)
+		err = storage.CommentAndChangeLeaveStatus(leaveApplication.Applier, "PENDING", leaveCommentHistory)
 		if err != nil {
 			return err
 		}
 
 	} else if leaveCommentHistory.Status == "approve" {
+		if !borrowAlowed {
+			return errors.New("Please allow borrow leave also")
+		}
+
 		routeStatus, err := storage.GetRouteStatusTo(leaveApplication.Applier, leaveApplication.RouteStatus)
 		if err == sql.ErrNoRows {
 			err = storage.CommentAndChangeLeaveStatus(leaveApplication.RouteStatus, "APPROVED", leaveCommentHistory)
 			if err != nil {
 				return err
 			}
+			err := storage.DeductLeave(leaveApplication.EmpID, util.DateTToYear(leaveApplication.StartDate),
+				leaveApplication.NumOfDays)
 
-			return nil
+			return err
 		} else if err != nil {
 			return err
 		}

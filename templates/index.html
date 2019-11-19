@@ -72,6 +72,15 @@
                                         <div class="col-md-6">
                                             <b>Time Stamp</b> : {{.Data.ActiveLeaveApplication.Timestamp}}
                                         </div>
+                                        {{ if .Data.ActiveLeaveApplication.BorrowedDays}}
+                                        <div class="col-md-12">
+                                            <div class="alert alert-warning" role="alert">
+                                                Extra request for borrow of
+                                                {{.Data.ActiveLeaveApplication.BorrowedDays}}
+                                                days from next year.
+                                            </div>
+                                        </div>
+                                        {{end}}
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
@@ -100,7 +109,8 @@
                                                 <div class="row">
                                                     <div class="col-xs-10 col-md-11">
                                                         <div class="form-group">
-                                                            <label for="Inputcommentreply{{ .Data.ActiveLeaveApplication.LeaveID}}">Comment</label>
+                                                            <label
+                                                                for="Inputcommentreply{{ .Data.ActiveLeaveApplication.LeaveID}}">Comment</label>
                                                             <textarea class="form-control"
                                                                 id="Inputcommentreply{{ .Data.ActiveLeaveApplication.LeaveID}}"
                                                                 placeholder="Add comment..." required></textarea>
@@ -146,6 +156,14 @@
                                         <div class="col-md-6">
                                             <b>Time Stamp</b> : {{.Timestamp}}
                                         </div>
+                                        {{ if .BorrowedDays}}
+                                        <div class="col-md-12">
+                                            <div class="alert alert-warning" role="alert">
+                                                Extra request for borrow of {{ .BorrowedDays }}
+                                                days from next year.
+                                            </div>
+                                        </div>
+                                        {{end}}
                                     </div>
                                     <div class="row">
                                         <div class="col-md-12">
@@ -216,6 +234,14 @@
                                 <div class="col-md-6">
                                     <b>Time Stamp</b> : {{.Timestamp}}
                                 </div>
+                                {{ if .BorrowedDays}}
+                                <div class="col-md-12">
+                                    <div class="alert alert-warning" role="alert">
+                                        Extra request for borrow of {{ .BorrowedDays }}
+                                        days from next year.
+                                    </div>
+                                </div>
+                                {{end}}
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
@@ -247,6 +273,16 @@
                                                     <textarea class="form-control" id="Inputcommentreply{{ .LeaveID}}"
                                                         placeholder="Add comment..." required></textarea>
                                                 </div>
+                                                {{ if .BorrowedDays}}
+                                                <div class="form-group form-check">
+                                                    <input type="checkbox" class="form-check-input"
+                                                        id="Check{{ .LeaveID}}" required>
+                                                    <label class="form-check-label" for="Check{{ .LeaveID}}">Allow
+                                                        borrow of
+                                                        {{ .BorrowedDays }}
+                                                        days from next year.</label>
+                                                </div>
+                                                {{end}}
                                                 <div class="form-row">
                                                     <div class="col-md-3">
                                                         <button onclick="commentLeaveReq('send_back', '{{ .LeaveID}}')"
@@ -290,12 +326,15 @@
 
         if ($('#Inputcommentreply' + id).val().trim() == "")
             $('#Inputcommentreply' + id).focus();
+        else if ($('#Check' + id).is(':checked') == false && action == 'approve')
+            alert('Please confirm the borrow leave to approve.');
         else
             senddata({
                 'commentLeaveReq': {
                     'comment': $('#Inputcommentreply' + id).val(),
-                    'leave_id': id,
+                    'leave_id': parseInt(id),
                     'action': action,
+                    'borrow_approved': $('#Check' + id).is(':checked'),
                 }
             }, true);
     }
@@ -304,7 +343,7 @@
         var formdata = $('#leaveform').serializeArray();
         senddata({
             'applyForLeave': {
-                'no_of_days': formdata[0].value,
+                'no_of_days': parseInt(formdata[0].value),
                 'start_date': formdata[1].value,
                 'comment': formdata[2].value,
             }

@@ -14,3 +14,10 @@ func DateTimeToDate(dtstr string) string {
 func GetCurrentYear() int16 {
 	return int16(time.Now().Year())
 }
+
+// DateTToYear convert datet to year
+func DateTToYear(dtstr string) int {
+	dt, _ := time.Parse("2006-01-02", dtstr)
+
+	return dt.Year()
+}

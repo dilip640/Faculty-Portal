@@ -29,14 +29,43 @@ func GetRemainingLeaves(empID string, y ...int) (int, error) {
 
 // DeductLeave deduct of an employee
 func DeductLeave(empID string, year, days int) error {
-	_, err := db.Exec(`UPDATE leave SET no_of_leaves = no_of_leaves - $1 WHERE emp_id = $2 AND year = $3`,
-		days, empID, year)
+	currLeaves, err := GetRemainingLeaves(empID, year)
+	if err != nil {
+		return err
+	}
+	borrowedDays := 0
+	if days > currLeaves {
+		borrowedDays = days - currLeaves
+	}
 
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	_, err = tx.Exec(`UPDATE leave SET no_of_leaves = no_of_leaves - $1 WHERE emp_id = $2 AND year = $3`,
+		days-borrowedDays, empID, year)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if borrowedDays > 0 {
+		_, err = tx.Exec(`UPDATE leave SET no_of_leaves = no_of_leaves - $1 WHERE emp_id = $2 AND year = $3`,
+			borrowedDays, empID, year+1)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit()
 	return err
 }
 
 // CreateLeaveApplication create new leave
-func CreateLeaveApplication(empID string, noOfDays int, startDate, applier, routeStatus, status, comment string) error {
+func CreateLeaveApplication(empID string, noOfDays, borrowedDays int, startDate, applier,
+	routeStatus, status, comment string) error {
+
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -48,6 +77,15 @@ func CreateLeaveApplication(empID string, noOfDays int, startDate, applier, rout
 	if err != nil {
 		tx.Rollback()
 		return err
+	}
+
+	if borrowedDays > 0 {
+		_, err = tx.Exec(`INSERT INTO borrowed_leave(leave_id, no_of_days)
+				VALUES(currval('leave_application_id_seq'), $1);`, borrowedDays)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	_, err = tx.Exec(`INSERT INTO leave_comment_history(leave_id, signed_by, comment, status)
@@ -75,6 +113,7 @@ func GetActiveApplication(empID string) (LeaveApplication, error) {
 		&leaveApplication.Status, &startDate)
 	leaveApplication.StartDate = util.DateTimeToDate(startDate)
 	leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+	leaveApplication.BorrowedDays, _ = GetBorrowedLeave(leaveApplication.LeaveID)
 
 	return leaveApplication, err
 }
@@ -100,7 +139,9 @@ func GetPastApplications(empID string) ([]*LeaveApplication, error) {
 			&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
 			&leaveApplication.Status, &startDate); err == nil {
 			leaveApplication.StartDate = util.DateTimeToDate(startDate)
-			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplication.LeaveCommentHistories, _ = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplication.BorrowedDays, _ = GetBorrowedLeave(leaveApplication.LeaveID)
+
 			leaveApplications = append(leaveApplications, &leaveApplication)
 		} else {
 			log.Error(err)
@@ -122,7 +163,8 @@ func GetLeaveApplication(leavID int) (LeaveApplication, error) {
 		&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
 		&leaveApplication.Status, &leaveApplication.StartDate)
 	leaveApplication.StartDate = util.DateTimeToDate(leaveApplication.StartDate)
-	leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+	leaveApplication.LeaveCommentHistories, _ = GetLeaveCommentHistory(leaveApplication.LeaveID)
+	leaveApplication.BorrowedDays, _ = GetBorrowedLeave(leaveApplication.LeaveID)
 
 	return leaveApplication, err
 }
@@ -149,7 +191,8 @@ func GetActiveHodRequests(deptID int) ([]*LeaveApplication, error) {
 			&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
 			&leaveApplication.Status, &startDate); err == nil {
 			leaveApplication.StartDate = util.DateTimeToDate(startDate)
-			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplication.LeaveCommentHistories, _ = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplication.BorrowedDays, _ = GetBorrowedLeave(leaveApplication.LeaveID)
 
 			reqs = append(reqs, &leaveApplication)
 		} else {
@@ -183,7 +226,8 @@ func GetActiveCCFRequests(postName string) ([]*LeaveApplication, error) {
 			&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
 			&leaveApplication.Status, &startDate); err == nil {
 			leaveApplication.StartDate = util.DateTimeToDate(startDate)
-			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplication.LeaveCommentHistories, _ = GetLeaveCommentHistory(leaveApplication.LeaveID)
+			leaveApplication.BorrowedDays, _ = GetBorrowedLeave(leaveApplication.LeaveID)
 
 			reqs = append(reqs, &leaveApplication)
 		} else {
@@ -249,6 +293,14 @@ func CommentAndChangeLeaveStatus(routeStatus, status string, leaveCommentHistory
 	return err
 }
 
+// GetBorrowedLeave returns borrored leave
+func GetBorrowedLeave(leaveID int) (int, error) {
+	borrowedDays := 0
+	err := db.QueryRow(`SELECT no_of_days FROM borrowed_leave WHERE leave_id = $1`, leaveID).Scan(&borrowedDays)
+
+	return borrowedDays, err
+}
+
 // LeaveApplication struct
 type LeaveApplication struct {
 	LeaveID               int
@@ -260,7 +312,7 @@ type LeaveApplication struct {
 	Status                string
 	StartDate             string
 	LeaveCommentHistories []*LeaveCommentHistory
-	borrowedDays          int
+	BorrowedDays          int
 }
 
 // LeaveCommentHistory struct
