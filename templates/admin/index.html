@@ -174,7 +174,7 @@
         var formdata = $('#hodform').serializeArray();
         senddata({
             'assignHOD': {
-                'deptID': formdata[0].value,
+                'deptID': parseInt(formdata[0].value),
                 'empID': formdata[1].value,
                 'startDate': formdata[2].value,
             }

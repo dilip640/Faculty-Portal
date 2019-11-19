@@ -39,7 +39,7 @@
                                 <div class="col-md-12">
                                     <p data-placeholder="Describe yourself..." id="bio"
                                         contenteditable="{{ .Data.Style.Edit }}" class="{{ .Data.Style.Class }}">
-                                        {{ .Data.CVDetail.Overview.Biography}}</p>
+                                        {{ html .Data.CVDetail.Overview.Biography}}</p>
                                 </div>
                                 {{if .Data.Style.Edit}}
                                 <div class="col-md-6 ml-auto"><a href="#" onClick="saveBio();"><i class="fas fa-save">
@@ -50,7 +50,7 @@
                                 <h4>About Me</h4>
                                 <p data-placeholder="Write about you..." id="about"
                                     contenteditable="{{ .Data.Style.Edit }}" class="{{ .Data.Style.Class }}">
-                                    {{ .Data.CVDetail.Overview.AboutMe}}</p>
+                                    {{ html .Data.CVDetail.Overview.AboutMe}}</p>
                                 {{if .Data.Style.Edit}}
                                 <div class="col-md-6 ml-auto"><a href="#" onClick="saveAbout();"><i class="fas fa-save">
                                             Save</i></a></div>

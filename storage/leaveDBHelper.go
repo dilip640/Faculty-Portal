@@ -128,14 +128,48 @@ func GetLeaveApplication(leavID int) (LeaveApplication, error) {
 }
 
 // GetActiveHodRequests will return all the Leave requests corresponding to that HOD
-func GetActiveHodRequests(deptID string, routeStatus string) ([]*LeaveApplication, error) {
+func GetActiveHodRequests(deptID int) ([]*LeaveApplication, error) {
 	reqs := make([]*LeaveApplication, 0)
 	rows, err := db.Query(
 		`SELECT la.id, la.emp_id, la.no_of_days, la.time_stamp, la.applier, 
 				la.route_status, la.status, la.start_date FROM leave_application AS la, faculty AS f 
-				WHERE f.emp_id=la.emp_id AND f.dept_id=$1 AND la.route_status=$2 
+				WHERE f.emp_id=la.emp_id AND f.dept_id=$1 AND la.route_status='hod'
 				AND (la.status='PENDING' OR la.status='INITIALIZED') 
-				AND la.applier <> 'hod'`, deptID, routeStatus)
+				AND la.applier <> 'hod'`, deptID)
+	if err != nil {
+		return reqs, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		leaveApplication := LeaveApplication{}
+		var startDate string
+
+		if err := rows.Scan(&leaveApplication.LeaveID, &leaveApplication.EmpID, &leaveApplication.NumOfDays,
+			&leaveApplication.Timestamp, &leaveApplication.Applier, &leaveApplication.RouteStatus,
+			&leaveApplication.Status, &startDate); err == nil {
+			leaveApplication.StartDate = util.DateTimeToDate(startDate)
+			leaveApplication.LeaveCommentHistories, err = GetLeaveCommentHistory(leaveApplication.LeaveID)
+
+			reqs = append(reqs, &leaveApplication)
+		} else {
+			log.Error(err)
+		}
+
+	}
+
+	return reqs, nil
+}
+
+// GetActiveCCFRequests will return all the Leave requests corresponding to that post
+func GetActiveCCFRequests(postName string) ([]*LeaveApplication, error) {
+	reqs := make([]*LeaveApplication, 0)
+	rows, err := db.Query(`SELECT la.id, la.emp_id, la.no_of_days, la.time_stamp, la.applier, 
+							la.route_status, la.status, la.start_date FROM leave_application AS la
+							WHERE EXISTS(SELECT * FROM application_route AS ar 
+												WHERE ar.applier = la.applier AND ar.ccf_post = $1)
+							AND la.route_status='ccf' AND (la.status='PENDING' OR la.status='INITIALIZED') 
+							AND la.applier <> 'ccf'`, postName)
 	if err != nil {
 		return reqs, err
 	}
@@ -213,10 +247,6 @@ func CommentAndChangeLeaveStatus(routeStatus, status string, leaveCommentHistory
 
 	err = tx.Commit()
 	return err
-}
-
-func GetBorrowedLeaves(empID string, numOfDays int) {
-
 }
 
 // LeaveApplication struct

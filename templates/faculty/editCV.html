@@ -10,10 +10,10 @@
 {{define "js"}}
 <script>
     function saveBio() {
-        senddata({ 'biography': $('#bio').text() });
+        senddata({ 'biography': $('#bio').html() });
     }
     function saveAbout() {
-        senddata({ 'aboutme': $('#about').text() });
+        senddata({ 'aboutme': $('#about').html() });
     }
 
     function addProject() {

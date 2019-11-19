@@ -41,14 +41,15 @@ func GetActiveLeaveReqs(empID string) ([]*storage.LeaveApplication, error) {
 
 	hodDetails, err := storage.GetHodDetails(empID)
 	if err == nil {
-		leaveApplications, err = storage.GetActiveHodRequests(hodDetails.DeptID, "hod")
+		leaveApplications, err = storage.GetActiveHodRequests(hodDetails.DeptID)
 		return leaveApplications, err
 	}
 
-	// ccFacultyDetails, err := storage.GetCCFacultyDetails(empID)
-	// if err == nil {
-
-	// }
+	ccFacultyDetails, err := storage.GetCCFacultyDetails(empID)
+	if err == nil {
+		leaveApplications, err = storage.GetActiveCCFRequests(ccFacultyDetails.Post.Name)
+		return leaveApplications, err
+	}
 
 	return leaveApplications, err
 

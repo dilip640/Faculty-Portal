@@ -26,7 +26,7 @@ func GetHodDetails(empID string) (HOD, error) {
 // HOD struct
 type HOD struct {
 	EmpID     string `json:"empID"`
-	DeptID    string `json:"deptID"`
+	DeptID    int    `json:"deptID"`
 	StartDate string `json:"startDate"`
 	EndDate   string `json:"endDate"`
 }

@@ -1,6 +1,7 @@
 package templatemanager
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -11,12 +12,11 @@ import (
 
 // Render renders to page
 func Render(w http.ResponseWriter, auth string, input interface{}, name string, filenames ...string) {
-	t, err := template.ParseFiles(filenames...)
-	if err != nil {
-		log.Error(err)
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	t := template.Must(template.New("").Funcs(template.FuncMap{
+		"html": func(value interface{}) template.HTML {
+			return template.HTML(fmt.Sprint(value))
+		},
+	}).ParseFiles(filenames...))
 
 	data := struct {
 		User      string
