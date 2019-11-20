@@ -84,7 +84,7 @@ func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory, borrowAlow
 		}
 
 	} else if leaveCommentHistory.Status == "approve" {
-		if !borrowAlowed {
+		if !borrowAlowed && (leaveApplication.BorrowedDays > 0) {
 			return errors.New("Please allow borrow leave also")
 		}
 
