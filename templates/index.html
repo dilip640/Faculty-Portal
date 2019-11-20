@@ -59,7 +59,7 @@
                 <div class="card-body">
                     <div class="tab-content">
                         <div id="activeApplication" class="container tab-pane active">
-                            <div class=" card bg-light mb-3">
+                            <div class=" card">
                                 <div class="card-body">
                                     {{ if .Data.ActiveLeaveApplication.NumOfDays}}
                                     <div class="row">
@@ -101,7 +101,7 @@
                                                                     on {{ .Timestamp}}
                                                                 </div>
                                                                 <div class="mic-info">
-                                                                    {{.Status}} By : {{ .Position }}
+                                                                    {{.Status}} By : <b>{{ .Position }}</b>
                                                                 </div>
                                                             </div>
                                                             <div class="comment-text">
@@ -122,7 +122,7 @@
                                                                 placeholder="Add comment..." required></textarea>
                                                         </div>
                                                         <div class="form-row">
-                                                            <div class="col-md-3">
+                                                            <div class="col">
                                                                 <button
                                                                     onclick="commentLeaveReq('add_comment', '{{ .Data.ActiveLeaveApplication.LeaveID}}', '0')"
                                                                     class="btn btn-primary">Add Comment</button>
@@ -144,7 +144,7 @@
                         <div id="pastApplications" class="container tab-pane fade"><br>
                             {{if .Data.PastLeaveApplications}}
                             {{range .Data.PastLeaveApplications}}
-                            <div class=" card bg-light mb-3">
+                            <div class="card">
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -171,30 +171,37 @@
                                         </div>
                                         {{end}}
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <ul class="list-group">
-                                                {{ range .LeaveCommentHistories}}
-                                                <li class="list-group-item">
-                                                    <div class="row">
-                                                        <div class="col-xs-10 col-md-11">
-                                                            <div>
-                                                                <a href="/profile/{{ .SignedBy }}">{{ .SignedBy }}</a>
-                                                                <div class="mic-info">
-                                                                    on {{ .Timestamp}}
+                                    <a class="text-primary" data-toggle="collapse" data-target="#hide{{ .LeaveID}}">
+                                        <i class="fas fa-comments"></i> Comments
+                                    </a>
+
+                                    <div id="hide{{ .LeaveID}}" class="collapse">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <ul class="list-group">
+                                                    {{ range .LeaveCommentHistories}}
+                                                    <li class="list-group-item">
+                                                        <div class="row">
+                                                            <div class="col-xs-10 col-md-11">
+                                                                <div>
+                                                                    <a
+                                                                        href="/profile/{{ .SignedBy }}">{{ .SignedBy }}</a>
+                                                                    <div class="mic-info">
+                                                                        on {{ .Timestamp}}
+                                                                    </div>
+                                                                    <div class="mic-info">
+                                                                        {{.Status}} By : <b>{{ .Position }}</b>
+                                                                    </div>
                                                                 </div>
-                                                                <div class="mic-info">
-                                                                    {{.Status}} By : {{ .Position }}
+                                                                <div class="comment-text">
+                                                                    {{ .Comment}}
                                                                 </div>
-                                                            </div>
-                                                            <div class="comment-text">
-                                                                {{ .Comment}}
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </li>
-                                                {{end}}
-                                            </ul>
+                                                    </li>
+                                                    {{end}}
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -209,119 +216,9 @@
                 <br><br>
 
             </div>
+            <br><br>
         </div>
 
-        {{if or (.Hod.EmpID) (.CCFaculty.EmpID)}}
-        <div class="col-md-8 mx-auto">
-            <br><br>
-            <div class="card">
-                <div class="card-header">Active Leave Requests</div>
-                <div class="card-body">
-                    {{if .Data.ActiveLeaveReqs}}
-                    {{range .Data.ActiveLeaveReqs}}
-                    <div class=" card bg-light mb-3">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <b>Employee ID</b> : {{.EmpID}}
-                                </div>
-                                <div class="col-md-6">
-                                    <b>Start Date</b> : {{.StartDate}}
-                                </div>
-                                <div class="col-md-6">
-                                    <b>No of Days</b> : {{.NumOfDays}}
-                                </div>
-                                <div class="col-md-6">
-                                    <b>Route Status</b> : {{.RouteStatus}}
-                                </div>
-                                <div class="col-md-6">
-                                    <b>Approval Status</b> : {{.Status}}
-                                </div>
-                                <div class="col-md-6">
-                                    <b>Time Stamp</b> : {{.Timestamp}}
-                                </div>
-                                {{ if .BorrowedDays}}
-                                <div class="col-md-12">
-                                    <div class="alert alert-warning" role="alert">
-                                        Extra request for borrow of {{ .BorrowedDays }}
-                                        days from next year.
-                                    </div>
-                                </div>
-                                {{end}}
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <ul class="list-group">
-                                        {{ range .LeaveCommentHistories}}
-                                        <li class="list-group-item">
-                                            <div class="row">
-                                                <div class="col-xs-10 col-md-11">
-                                                    <div>
-                                                        <a href="/profile/{{ .SignedBy }}">{{ .SignedBy }}</a>
-                                                        <div class="mic-info">
-                                                            on {{ .Timestamp}}
-                                                        </div>
-                                                        <div class="mic-info">
-                                                            {{.Status}} By : {{ .Position }}
-                                                        </div>
-                                                    </div>
-                                                    <div class="comment-text">
-                                                        {{ .Comment}}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </li>
-                                        {{end}}
-                                        <div class="row">
-                                            <div class="col-xs-10 col-md-11">
-                                                <div class="form-group">
-                                                    <label for="Inputcommentreply{{ .LeaveID}}">Comment</label>
-                                                    <textarea class="form-control" id="Inputcommentreply{{ .LeaveID}}"
-                                                        placeholder="Add comment..." required></textarea>
-                                                </div>
-                                                {{ if .BorrowedDays}}
-                                                <div class="form-group form-check">
-                                                    <input type="checkbox" class="form-check-input"
-                                                        id="Check{{ .LeaveID}}" required>
-                                                    <label class="form-check-label" for="Check{{ .LeaveID}}">Allow
-                                                        borrow of
-                                                        {{ .BorrowedDays }}
-                                                        days from next year.</label>
-                                                </div>
-                                                {{end}}
-                                                <div class="form-row">
-                                                    <div class="col-md-3">
-                                                        <button
-                                                            onclick="commentLeaveReq('send_back', '{{ .LeaveID}}', '0')"
-                                                            class="btn btn-primary">Send Back</button>
-                                                    </div>
-                                                    <div class="col-md-2">
-                                                        <button
-                                                            onclick="commentLeaveReq('approve', '{{ .LeaveID}}', '{{.BorrowedDays}}')"
-                                                            class="btn btn-success">Approve</button>
-                                                    </div>
-                                                    <div class="col-md-2 ml-auto">
-                                                        <button
-                                                            onclick="commentLeaveReq('disapprove', '{{ .LeaveID}}', '0')"
-                                                            class="btn btn-danger">Disapprove</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {{end}}
-                    {{else}}
-                    Currently no leave requests in queue.
-                    {{end}}
-                </div>
-            </div>
-            <br><br>
-        </div>
-        {{end}}
     </div>
     {{else}}
     <p><a href="/login">Click Here</a> to login or <a href="/register">register</a></p>

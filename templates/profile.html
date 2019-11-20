@@ -3,73 +3,49 @@
 <div class="container" style="margin-top:50px">
     {{if .Employee.Uname}}
     <div class="row">
-        <div class="col-md-12 mx-auto">
+        <div class="col-md-4">
+            <!-- Card -->
             <div class="card">
-                <div class="card-header">Basic Details</div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <b>Username : </b>{{.User}}
-                        </div>
-                        <div class="col-md-6">
-                            <b>Name : </b>{{.Employee.Fname}}
-                            {{.Employee.Lname}}
-                        </div>
-                        <div class="col-md-6">
-                            <b>Email : </b>{{.Employee.Email}}
-                        </div>
-                        {{ if .Data.Self }}
-                        <div class="col-md-6">
-                            <b>Number of leaves : </b>{{.Data.NumLeaves}}
-                        </div>
-                        {{ end }}
-                    </div>
-                </div>
-            </div><br><br>
-        </div>
-    </div>
-    {{if .CCFaculty.EmpID}}
-    <div class="row">
-        <div class="col-md-12 mx-auto">
-            <div class="card">
-                <div class="card-header">Cross Cutting Faculty Details</div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b>Dept : </b>{{.CCFaculty.Post.Name}}
-                        </div>
-                        <div class="col-md-4">
-                            <b>Start Date : </b>{{.CCFaculty.StartDate}}
-                        </div>
-                    </div>
-                </div>
-            </div><br><br>
-        </div>
-    </div>
-    {{end}}
 
-    {{if .Faculty.EmpID}}
-    <div class="row">
-        <div class="col-md-12 mx-auto">
-            <div class="card">
-                <div class="card-header">Faculty Details</div>
+                <!-- Card image -->
+                <img class="card-img-top" src="/img/43.jpg" alt="Card image cap">
+
+                <!-- Card content -->
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <b>Dept : </b>{{.Faculty.Dept.Name}}
-                        </div>
-                        <div class="col-md-4">
-                            <b>Start Date : </b>{{.Faculty.StartDate}}
-                        </div>
-                    </div>
+
+                    <!-- Title -->
+                    <h4 class="card-title"><a>{{.Employee.Fname}} {{.Employee.Lname}}</a></h4>
+                    <!-- Text -->
+                    <p class="card-text">{{.User}}</p>
+                    <p class="card-text"><b>Email : </b>{{.Employee.Email}}</p>
+                    <p class="card-text">
+                        {{ if .Data.Self }}
+                        <b>Number of leaves : </b>{{.Data.NumLeaves}}
+                        {{ end }}
+                    </p>
+                    {{if .Faculty.EmpID}}
+                    <span class="badge badge-primary">Faculty Details</span>
+                    <p class="card-text"> <b>Dept : </b>{{.Faculty.Dept.Name}}</p>
+                    <p class="card-text"> <b>Join Date : </b>{{.Faculty.StartDate}}</p>
+                    {{end}}
+                    {{if .CCFaculty.EmpID}}
+                    <span class="badge badge-primary">Cross Cutting Faculty Details</span>
+                    <p class="card-text"> <b>Post : </b>{{.CCFaculty.Post.Name}}</p>
+                    <p class="card-text"> <b>Join Date : </b>{{.CCFaculty.StartDate}}</p>
+                    {{end}}
                 </div>
+
             </div>
+            <!-- Card -->
+        </div>
+        <div class="col-md-8">
+            {{if .Faculty.EmpID}}
+            <div class="row">
+                {{template "cv_template" .}}
+            </div>
+            {{end}}
         </div>
     </div>
-    <div class="row">
-        {{template "cv_template" .}}
-    </div>
-    {{end}}
 
     {{else}}
     <h3>Profile not found!</h3>

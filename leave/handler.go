@@ -8,6 +8,7 @@ import (
 
 	"github.com/dilip640/Faculty-Portal/auth"
 	"github.com/dilip640/Faculty-Portal/storage"
+	"github.com/dilip640/Faculty-Portal/templatemanager"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -55,6 +56,32 @@ func HandleLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+}
+
+// HandleLeaveRequest for leave request
+func HandleLeaveRequest(w http.ResponseWriter, r *http.Request) {
+	userName := auth.GetUserName(r)
+	if userName == "" {
+		http.Redirect(w, r, "/login", 302)
+		return
+	}
+
+	data := struct {
+		ActiveLeaveReqs []*storage.LeaveApplication
+	}{}
+
+	if userName != "" {
+
+		activeLeaveReqs, err := GetActiveLeaveReqs(userName)
+		if err == nil {
+			data.ActiveLeaveReqs = activeLeaveReqs
+		} else {
+			log.Error(err)
+		}
+	}
+
+	templatemanager.Render(w, userName, data, "base",
+		"templates/leave_request.html", "templates/base.html")
 }
 
 type leaveRequest struct {

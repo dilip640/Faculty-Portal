@@ -32,6 +32,22 @@ func GetEmployeeDetails(uname string) (Employee, error) {
 	return employee, err
 }
 
+// InsertAdmin add new admin
+func InsertAdmin(uname string) error {
+	sqlStatement := `INSERT INTO admin (emp_id)
+							VALUES ($1)`
+	_, err := db.Exec(sqlStatement, strings.ToLower(uname))
+	return err
+}
+
+// GetAdmin return admin
+func GetAdmin(uname string) (string, error) {
+	var empID string
+	sqlStatement := `SELECT emp_id FROM admin WHERE emp_id=$1`
+	err := db.QueryRow(sqlStatement, strings.ToLower(uname)).Scan(&empID)
+	return empID, err
+}
+
 // Employee for an Employee details
 type Employee struct {
 	Uname string

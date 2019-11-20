@@ -40,6 +40,8 @@ func SetupRoutes() {
 
 	Router.HandleFunc("/leaveapplication",
 		wrapHandlerWithLogging(leave.HandleLeave))
+	Router.HandleFunc("/leave-requests",
+		wrapHandlerWithLogging(leave.HandleLeaveRequest))
 
 	// Admin routes
 	Router.HandleFunc("/admin",

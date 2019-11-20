@@ -21,6 +21,12 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err := storage.GetAdmin(userName)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		return
+	}
+
 	if r.Method == http.MethodPost {
 		var err error
 		var reqStruct adminEditRequest
@@ -62,6 +68,7 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 		Departments []*storage.Department
 		Posts       []*storage.Post
 		Routes      []*storage.Route
+		Hods        []*storage.HODDetail
 	}{}
 
 	depts, err := storage.GetAllDepartments()
@@ -81,6 +88,13 @@ func HandleAdmin(w http.ResponseWriter, r *http.Request) {
 	routes, err := storage.GetAllRoutes()
 	if err == nil {
 		data.Routes = routes
+	} else {
+		log.Error(err)
+	}
+
+	hods, err := storage.GetAllHOD()
+	if err == nil {
+		data.Hods = hods
 	} else {
 		log.Error(err)
 	}

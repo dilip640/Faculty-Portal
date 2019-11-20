@@ -19,12 +19,13 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 	}).ParseFiles(filenames...))
 
 	data := struct {
-		User      string
-		Data      interface{}
-		Faculty   storage.Faculty
-		CCFaculty storage.CCFaculty
-		Employee  storage.Employee
-		Hod       storage.HOD
+		User       string
+		Data       interface{}
+		Faculty    storage.Faculty
+		CCFaculty  storage.CCFaculty
+		Employee   storage.Employee
+		Hod        storage.HOD
+		NumRequest int
 	}{User: auth, Data: input}
 
 	faculty, err := storage.GetFacultyDetails(auth)
@@ -53,6 +54,14 @@ func Render(w http.ResponseWriter, auth string, input interface{}, name string, 
 		data.Hod = hod
 	} else {
 		log.Error(err)
+	}
+
+	activeLeaveReqs, err := storage.GetActiveHodRequests(hod.DeptID)
+	if err != nil {
+		activeLeaveReqs, err = storage.GetActiveCCFRequests(ccFaculty.EmpID)
+	}
+	if err == nil {
+		data.NumRequest = len(activeLeaveReqs)
 	}
 
 	err = t.ExecuteTemplate(w, name, data)
