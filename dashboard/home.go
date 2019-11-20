@@ -18,9 +18,18 @@ func HandleHome(w http.ResponseWriter, r *http.Request) {
 		ActiveLeaveApplication storage.LeaveApplication
 		PastLeaveApplications  []*storage.LeaveApplication
 		ActiveLeaveReqs        []*storage.LeaveApplication
+		NumLeaves              int
 	}{}
 
 	if userName != "" {
+
+		numLeaves, err := storage.GetRemainingLeaves(userName)
+		if err == nil {
+			data.NumLeaves = numLeaves
+		} else {
+			log.Error(err)
+		}
+
 		activeLeaveApplication, err := storage.GetActiveApplication(userName)
 		if err == nil {
 			data.ActiveLeaveApplication = activeLeaveApplication

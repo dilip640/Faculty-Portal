@@ -13,6 +13,12 @@
                 <div class="card-body">
                     <form id="leaveform" onsubmit="return applyForLeave()">
                         <div class="form-row">
+                            Leaves Remaining : {{.Data.NumLeaves}}
+                        </div>
+
+                        <br>
+
+                        <div class="form-row">
                             <div class="form-group col-md-5">
                                 <label for="Inputnoleaves">No of Days</label>
                                 <input type="number" name="no_of_days" class="form-control" id="Inputnoleaves"
@@ -285,15 +291,18 @@
                                                 {{end}}
                                                 <div class="form-row">
                                                     <div class="col-md-3">
-                                                        <button onclick="commentLeaveReq('send_back', '{{ .LeaveID}}', '0')"
+                                                        <button
+                                                            onclick="commentLeaveReq('send_back', '{{ .LeaveID}}', '0')"
                                                             class="btn btn-primary">Send Back</button>
                                                     </div>
                                                     <div class="col-md-2">
-                                                        <button onclick="commentLeaveReq('approve', '{{ .LeaveID}}', '{{.BorrowedDays}}')"
+                                                        <button
+                                                            onclick="commentLeaveReq('approve', '{{ .LeaveID}}', '{{.BorrowedDays}}')"
                                                             class="btn btn-success">Approve</button>
                                                     </div>
                                                     <div class="col-md-2 ml-auto">
-                                                        <button onclick="commentLeaveReq('disapprove', '{{ .LeaveID}}', '0')"
+                                                        <button
+                                                            onclick="commentLeaveReq('disapprove', '{{ .LeaveID}}', '0')"
                                                             class="btn btn-danger">Disapprove</button>
                                                     </div>
                                                 </div>
@@ -325,7 +334,7 @@
     function commentLeaveReq(action, id, borrowedDays) {
         if ($('#Inputcommentreply' + id).val().trim() == "")
             $('#Inputcommentreply' + id).focus();
-        else if ($('#Check' + id).is(':checked') == false && action == 'approve' && borrowedDays!='0')
+        else if ($('#Check' + id).is(':checked') == false && action == 'approve' && borrowedDays != '0')
             alert('Please confirm the borrow leave to approve.');
         else
             senddata({
