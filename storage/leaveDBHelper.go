@@ -2,6 +2,8 @@ package storage
 
 import (
 	"errors"
+	"os"
+	"strconv"
 
 	"github.com/dilip640/Faculty-Portal/util"
 	log "github.com/sirupsen/logrus"
@@ -19,10 +21,12 @@ func GetRemainingLeaves(empID string, y ...int) (int, error) {
 		return year, errors.New("Invalid Arguments")
 	}
 
-	sqlStatement := `SELECT get_remaining_leave($1, $2)`
+	sqlStatement := `SELECT get_remaining_leave($1, $2, $3)`
+
+	annualLeaves, _ := strconv.Atoi(os.Getenv("ANNUAL_LEAVE"))
 
 	var numLeaves int
-	err := db.QueryRow(sqlStatement, empID, year).Scan(&numLeaves)
+	err := db.QueryRow(sqlStatement, empID, year, annualLeaves).Scan(&numLeaves)
 
 	return numLeaves, err
 }
