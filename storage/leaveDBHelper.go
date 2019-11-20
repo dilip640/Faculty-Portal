@@ -88,8 +88,8 @@ func CreateLeaveApplication(empID string, noOfDays, borrowedDays int, startDate,
 		}
 	}
 
-	_, err = tx.Exec(`INSERT INTO leave_comment_history(leave_id, signed_by, comment, status)
-				VALUES(currval('leave_application_id_seq'), $1, $2, $3);`, empID, comment, status)
+	_, err = tx.Exec(`INSERT INTO leave_comment_history(leave_id, signed_by, comment, status, position)
+				VALUES(currval('leave_application_id_seq'), $1, $2, $3, $4);`, empID, comment, status, applier)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -244,7 +244,7 @@ func GetLeaveCommentHistory(LeaveID int) ([]*LeaveCommentHistory, error) {
 	leaveCommentHistories := make([]*LeaveCommentHistory, 0)
 
 	rows, err := db.Query(
-		`SELECT leave_id, signed_by, comment, status, time_stamp FROM leave_comment_history
+		`SELECT leave_id, signed_by, comment, status, time_stamp, position FROM leave_comment_history
 					WHERE leave_id=$1`, LeaveID)
 	if err != nil {
 		return leaveCommentHistories, err
@@ -256,7 +256,7 @@ func GetLeaveCommentHistory(LeaveID int) ([]*LeaveCommentHistory, error) {
 
 		if err := rows.Scan(&leaveCommentHistory.LeaveID, &leaveCommentHistory.SignedBy,
 			&leaveCommentHistory.Comment, &leaveCommentHistory.Status,
-			&leaveCommentHistory.Timestamp); err == nil {
+			&leaveCommentHistory.Timestamp, &leaveCommentHistory.Position); err == nil {
 
 			leaveCommentHistories = append(leaveCommentHistories, &leaveCommentHistory)
 		} else {
@@ -281,9 +281,9 @@ func CommentAndChangeLeaveStatus(routeStatus, status string, leaveCommentHistory
 		return err
 	}
 
-	_, err = tx.Exec(`INSERT INTO leave_comment_history(leave_id, signed_by, comment, status)
-				VALUES($1, $2, $3, $4);`, leaveCommentHistory.LeaveID, leaveCommentHistory.SignedBy,
-		leaveCommentHistory.Comment, leaveCommentHistory.Status)
+	_, err = tx.Exec(`INSERT INTO leave_comment_history(leave_id, signed_by, comment, status, position)
+				VALUES($1, $2, $3, $4, $5);`, leaveCommentHistory.LeaveID, leaveCommentHistory.SignedBy,
+		leaveCommentHistory.Comment, leaveCommentHistory.Status, leaveCommentHistory.Position)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -293,10 +293,20 @@ func CommentAndChangeLeaveStatus(routeStatus, status string, leaveCommentHistory
 	return err
 }
 
+// GetLatestRoute give us the route from which the application was sent back.
+func GetLatestRoute(leaveID int) (string, error) {
+	var latestRoute string
+	err := db.QueryRow(`SELECT position FROM leave_comment_history 
+							WHERE leave_id = $1 ORDER BY time_stamp DESC`, leaveID).Scan(&latestRoute)
+
+	return latestRoute, err
+}
+
 // GetBorrowedLeave returns borrored leave
 func GetBorrowedLeave(leaveID int) (int, error) {
 	borrowedDays := 0
-	err := db.QueryRow(`SELECT no_of_days FROM borrowed_leave WHERE leave_id = $1`, leaveID).Scan(&borrowedDays)
+	err := db.QueryRow(`SELECT no_of_days FROM borrowed_leave 
+							WHERE leave_id = $1`, leaveID).Scan(&borrowedDays)
 
 	return borrowedDays, err
 }
@@ -322,4 +332,5 @@ type LeaveCommentHistory struct {
 	Comment   string
 	Status    string
 	Timestamp string
+	Position  string
 }

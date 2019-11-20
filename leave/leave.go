@@ -77,6 +77,9 @@ func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory, borrowAlow
 		return err
 	}
 
+	// For position of added comment.
+	leaveCommentHistory.Position = leaveApplication.RouteStatus
+
 	if leaveCommentHistory.Status == "send_back" {
 		err = storage.CommentAndChangeLeaveStatus(leaveApplication.Applier, "PENDING", leaveCommentHistory)
 		if err != nil {
@@ -112,12 +115,12 @@ func ValidateComment(leaveCommentHistory storage.LeaveCommentHistory, borrowAlow
 			return err
 		}
 	} else if leaveCommentHistory.Status == "add_comment" {
-		routeStatus, err := storage.GetRouteStatusTo(leaveApplication.Applier, leaveApplication.RouteStatus)
+		routeStatus, err := storage.GetLatestRoute(leaveApplication.LeaveID)
 		if err != nil {
 			return err
 		}
 
-		err = storage.CommentAndChangeLeaveStatus(routeStatus.RouteTo, "PENDING", leaveCommentHistory)
+		err = storage.CommentAndChangeLeaveStatus(routeStatus, "PENDING", leaveCommentHistory)
 		if err != nil {
 			return err
 		}
