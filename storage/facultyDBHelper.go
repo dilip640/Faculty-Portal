@@ -67,7 +67,7 @@ func GetAllFacultyDetails() ([]*FacultyDetails, error) {
 func GetAllPastFacultyDetails() ([]*FacultyDetails, error) {
 	faculties := make([]*FacultyDetails, 0)
 
-	rows, err := db.Query(`SELECT emp_id, dept_id, start_date, end_date FROM faculty_history`)
+	rows, err := dbRead.Query(`SELECT emp_id, dept_id, start_date, end_date FROM faculty_history`)
 	if err != nil {
 		return faculties, err
 	}

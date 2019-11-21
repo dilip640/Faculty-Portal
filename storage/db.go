@@ -13,6 +13,7 @@ import (
 )
 
 var db *sql.DB
+var dbRead *sql.DB
 
 //Initialize initializes the database
 func Initialize() {
@@ -22,7 +23,12 @@ func Initialize() {
 	databasePass := os.Getenv("DB_PASS")
 	databaseName := os.Getenv("DB_NAME")
 
+	databaseUserRead := os.Getenv("DB_USER_READ")
+	databasePassRead := os.Getenv("DB_PASS_READ")
+
 	postgresConnectionURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", databaseUser, databasePass, databaseHost, databasePort, databaseName)
+
+	postgresConnectionURLRead := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", databaseUserRead, databasePassRead, databaseHost, databasePort, databaseName)
 
 	var err error
 	db, err = sql.Open("postgres", postgresConnectionURL)
@@ -31,7 +37,17 @@ func Initialize() {
 	}
 	//defer db.Close()
 
+	dbRead, err = sql.Open("postgres", postgresConnectionURLRead)
+	if err != nil {
+		log.Panic(err)
+	}
+
 	err = db.Ping()
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = dbRead.Ping()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -47,6 +63,9 @@ func Initialize() {
 
 	db.SetMaxOpenConns(maxOpenConn)
 	db.SetMaxIdleConns(maxIdleConn)
+
+	dbRead.SetMaxOpenConns(maxOpenConn)
+	dbRead.SetMaxIdleConns(maxIdleConn)
 
 	log.Println("Database connected!")
 
