@@ -45,6 +45,7 @@ func GetAllHOD() ([]*HODDetail, error) {
 			hod.StartDate = util.DateTimeToDate(hod.StartDate)
 			hod.EndDate = util.DateTimeToDate(hod.EndDate)
 			hod.Dept, _ = GetDepartment(deptID)
+			hod.EmployeeDetail, _ = GetEmployeeDetails(hod.EmpID)
 
 			hods = append(hods, &hod)
 		} else {
@@ -65,8 +66,9 @@ type HOD struct {
 
 // HODDetail struct for admin page
 type HODDetail struct {
-	EmpID     string     `json:"empID"`
-	Dept      Department `json:"dept"`
-	StartDate string     `json:"startDate"`
-	EndDate   string     `json:"endDate"`
+	EmpID          string     `json:"empID"`
+	Dept           Department `json:"dept"`
+	EmployeeDetail Employee
+	StartDate      string `json:"startDate"`
+	EndDate        string `json:"endDate"`
 }

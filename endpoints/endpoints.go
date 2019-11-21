@@ -38,6 +38,8 @@ func SetupRoutes() {
 	Router.HandleFunc("/faculty/editcv",
 		wrapHandlerWithLogging(personalcv.HandleCVEdit))
 
+	Router.HandleFunc("/employeedetails", wrapHandlerWithLogging(dashboard.HandleEmployeeDetails))
+
 	Router.HandleFunc("/leaveapplication",
 		wrapHandlerWithLogging(leave.HandleLeave))
 	Router.HandleFunc("/leave-requests",
