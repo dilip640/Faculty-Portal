@@ -63,6 +63,35 @@ func GetAllFacultyDetails() ([]*FacultyDetails, error) {
 	return faculties, nil
 }
 
+// GetAllPastFacultyDetails returns all the past faculties.
+func GetAllPastFacultyDetails() ([]*FacultyDetails, error) {
+	faculties := make([]*FacultyDetails, 0)
+
+	rows, err := db.Query(`SELECT emp_id, dept_id, start_date, end_date FROM faculty_history`)
+	if err != nil {
+		return faculties, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var startDate string
+		faculty := FacultyDetails{}
+
+		if err := rows.Scan(&faculty.EmpID, &faculty.Dept.DeptID, &startDate, &faculty.EndDate); err == nil {
+			faculty.StartDate = util.DateTimeToDate(startDate)
+			faculty.EndDate = util.DateTimeToDate(faculty.EndDate)
+			faculty.Dept, err = GetDepartment(faculty.Dept.DeptID)
+			faculty.EmployeeDetail, _ = GetEmployeeDetails(faculty.EmpID)
+			faculties = append(faculties, &faculty)
+		} else {
+			log.Error(err)
+		}
+	}
+
+	return faculties, nil
+}
+
 // Faculty struct
 type Faculty struct {
 	EmpID     string
@@ -70,10 +99,11 @@ type Faculty struct {
 	Dept      Department
 }
 
-// Faculty struct
+// FacultyDetails struct
 type FacultyDetails struct {
 	EmpID          string
 	EmployeeDetail Employee
 	StartDate      string
 	Dept           Department
+	EndDate        string
 }

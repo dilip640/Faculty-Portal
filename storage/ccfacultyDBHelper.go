@@ -50,7 +50,7 @@ func GetAllccFacultyDetails() ([]*CCFacultyDetails, error) {
 		var startDate string
 		ccFaculty := CCFacultyDetails{}
 
-		if err := rows.Scan(&ccFaculty.EmpID, &ccFaculty.Post.PostID, startDate); err == nil {
+		if err := rows.Scan(&ccFaculty.EmpID, &ccFaculty.Post.PostID, &startDate); err == nil {
 			ccFaculty.StartDate = util.DateTimeToDate(startDate)
 			ccFaculty.Post, err = GetPost(ccFaculty.Post.PostID)
 			ccFaculty.EmployeeDetail, _ = GetEmployeeDetails(ccFaculty.EmpID)
@@ -62,6 +62,51 @@ func GetAllccFacultyDetails() ([]*CCFacultyDetails, error) {
 	}
 
 	return ccFaculties, nil
+}
+
+// GetAllPastccFacultyDetails returns all the faculties.
+func GetAllPastccFacultyDetails() ([]*CCFacultyDetails, error) {
+	ccFaculties := make([]*CCFacultyDetails, 0)
+
+	rows, err := db.Query(`SELECT emp_id, post_id, start_date, end_date FROM cc_faculty_history`)
+	if err != nil {
+		return ccFaculties, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var startDate string
+		ccFaculty := CCFacultyDetails{}
+
+		if err := rows.Scan(&ccFaculty.EmpID, &ccFaculty.Post.PostID, &startDate, &ccFaculty.EndDate); err == nil {
+			ccFaculty.StartDate = util.DateTimeToDate(startDate)
+			ccFaculty.EndDate = util.DateTimeToDate(ccFaculty.EndDate)
+			ccFaculty.Post, err = GetPost(ccFaculty.Post.PostID)
+			ccFaculty.EmployeeDetail, _ = GetEmployeeDetails(ccFaculty.EmpID)
+
+			ccFaculties = append(ccFaculties, &ccFaculty)
+		} else {
+			log.Error(err)
+		}
+	}
+
+	return ccFaculties, nil
+}
+
+// GetDirector returns director
+func GetDirector() (CCFacultyDetails, error) {
+	var startDate string
+
+	ccFaculty := CCFacultyDetails{}
+	sqlStatement := `SELECT emp_id, post_id, start_date FROM cc_faculty, post
+						WHERE post_id=post.id AND post.post_name='Director'`
+	err := db.QueryRow(sqlStatement).Scan(
+		&ccFaculty.EmpID, &ccFaculty.Post.PostID, &startDate)
+	ccFaculty.StartDate = util.DateTimeToDate(startDate)
+	ccFaculty.Post, err = GetPost(ccFaculty.Post.PostID)
+	ccFaculty.EmployeeDetail, _ = GetEmployeeDetails(ccFaculty.EmpID)
+	return ccFaculty, err
 }
 
 // CCFaculty struct
@@ -77,4 +122,5 @@ type CCFacultyDetails struct {
 	EmployeeDetail Employee
 	StartDate      string
 	Post           Post
+	EndDate        string
 }

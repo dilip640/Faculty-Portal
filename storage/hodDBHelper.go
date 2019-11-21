@@ -56,6 +56,36 @@ func GetAllHOD() ([]*HODDetail, error) {
 	return hods, nil
 }
 
+// GetAllPastHOD returns all past hods
+func GetAllPastHOD() ([]*HODDetail, error) {
+	hods := make([]*HODDetail, 0)
+
+	rows, err := db.Query(
+		`SELECT emp_id, dept_id, start_date, end_date FROM hod_history`)
+	if err != nil {
+		return hods, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var hod HODDetail
+		var deptID int
+
+		if err := rows.Scan(&hod.EmpID, &deptID, &hod.StartDate, &hod.EndDate); err == nil {
+			hod.StartDate = util.DateTimeToDate(hod.StartDate)
+			hod.EndDate = util.DateTimeToDate(hod.EndDate)
+			hod.Dept, _ = GetDepartment(deptID)
+			hod.EmployeeDetail, _ = GetEmployeeDetails(hod.EmpID)
+
+			hods = append(hods, &hod)
+		} else {
+			log.Error(err)
+		}
+	}
+
+	return hods, nil
+}
+
 // HOD struct
 type HOD struct {
 	EmpID     string `json:"empID"`
