@@ -20,7 +20,7 @@ require (
 	github.com/xdg/stringprep v1.0.0 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
 	go.mongodb.org/mongo-driver v1.1.2
-	golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4
+	golang.org/x/crypto v0.1.0
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 )
